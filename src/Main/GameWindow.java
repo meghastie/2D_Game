@@ -9,6 +9,7 @@ public class GameWindow {
         frame.setSize(400,400);
         frame.setDefaultCloseOperation(frame.EXIT_ON_CLOSE); //stop running program on close
         frame.add(gamePanel); //should now be able to see actual graphics
+        frame.setLocationRelativeTo(null); //game window now in center
         frame.setVisible(true); //should be at end
     }
 }
