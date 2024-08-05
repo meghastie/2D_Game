@@ -10,9 +10,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static utilz.Constants.PlayerConstants.GetSpriteAmount;
-import static utilz.Constants.PlayerConstants.*;
-import static utilz.Constants.Directions.*;
+import static Utilz.Constants.PlayerConstants.*;
+import static Utilz.Constants.Directions.*;
 
 
 /*

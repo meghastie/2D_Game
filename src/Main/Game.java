@@ -42,7 +42,7 @@ public class Game implements Runnable {
             long currentTime = System.nanoTime();
 
             deltaU += (currentTime - previousTime) / timePerUpdate; //deltaU will be 1 or more when the duration since the last update is equal or more than timePerUpdate
-            deltaU += (currentTime - previousTime) / timePerFrame;
+            deltaF += (currentTime - previousTime) / timePerFrame;
             previousTime = currentTime;
 
             if(deltaU >=1) {
