@@ -1,16 +1,26 @@
 package Main;
 
+import Entities.Player;
+
+import java.awt.*;
+
 public class Game implements Runnable {
     private GameWindow gameWindow;
     private GamePanel gamePanel;
     private Thread gameThread;
     private final int FPS_SET = 120; //frames per sec, draws the game scence (level, players, enemies)
     private final int UPS_SET = 200; //updates per sec, takes care of all the game logic (Move player, events etc)
+    private Player player;
     public Game() {
-        gamePanel = new GamePanel();
+        initClasses(); //have to start before game panel as render is in game panel and player is in render but player is not initialised
+        gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel); //pass in panel to window so can see actual graphics
         gamePanel.requestFocus(); //used to get input
         startGameLoop();
+    }
+
+    private void initClasses() {
+        player = new Player(200,200);
     }
 
     private void startGameLoop() {
@@ -19,7 +29,11 @@ public class Game implements Runnable {
     }
 
     public void update() {
-        gamePanel.updateGame();
+        player.update();
+    }
+
+    public void render(Graphics g){
+        player.render(g);
     }
 
     @Override
@@ -65,4 +79,13 @@ public class Game implements Runnable {
             }
         }
     }
+
+    public void windowFocusLost(){ //if we lose focus of window (e.g. change window), all direction booleans become false - sprite will stop,
+        player.resetDirBooleans();
+    }
+
+    public Player getPlayer(){
+        return player;
+    }
+
 }
