@@ -23,7 +23,7 @@ public class GamePanel extends JPanel {
     private float xDelta = 100, yDelta = 100;
     private BufferedImage img;
     private BufferedImage[][] animations;
-    private int aniTick, aniIndex, aniSpeed = 15; //lower anispeed faster animaton will go
+    private int aniTick, aniIndex, aniSpeed = 15; //anispeed - lower anispeed faster animaton will go
     private int playerAction = IDLE;
     private int playerDir = -1; //if not moving, idle so -1. if moving it is o,1,2 or 3 (see Direction class)
     private boolean moving = false;
@@ -126,20 +126,20 @@ public class GamePanel extends JPanel {
         }
     }
 
+    public void updateGame() {
+        updateAnimationTick();
+        setAnimation();
+        updatePos();
+    }
+
     @Override //this method will just make an empty jpanel, must override to draw something on the pannel
     public void paintComponent(Graphics g) {
         super.paintComponent(g); //erase everything on previous frame to prevent glitching etc, must always call
-
-        updateAnimationTick();
-
-        setAnimation();
-        updatePos();
 
         g.drawImage(animations[playerAction][aniIndex], (int) xDelta, (int) yDelta, 256, 160, null); //xDelta and yDelta allows us to control sprite, have to cast to int
 
 
     }
-
 
 
 }

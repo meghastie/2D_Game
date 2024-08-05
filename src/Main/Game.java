@@ -4,7 +4,8 @@ public class Game implements Runnable {
     private GameWindow gameWindow;
     private GamePanel gamePanel;
     private Thread gameThread;
-    private final int FPS_SET = 120;
+    private final int FPS_SET = 120; //frames per sec, draws the game scence (level, players, enemies)
+    private final int UPS_SET = 200; //updates per sec, takes care of all the game logic (Move player, events etc)
     public Game() {
         gamePanel = new GamePanel();
         gameWindow = new GameWindow(gamePanel); //pass in panel to window so can see actual graphics
@@ -17,28 +18,50 @@ public class Game implements Runnable {
         gameThread.start();
     }
 
+    public void update() {
+        gamePanel.updateGame();
+    }
+
     @Override
     public void run() {
 
         double timePerFrame = 1000000000.0/FPS_SET; //nanoseconds
-        long lastFrame = System.nanoTime();
-        long now = System.nanoTime();
+        double timePerUpdate = 1000000000.0/UPS_SET; //time in between updates
+
+        long previousTime = System.nanoTime();
+
+
         int frames = 0;
+        int updates = 0;
         long lastCheck = System.currentTimeMillis();
 
+        double deltaU = 0; //update
+        double deltaF = 0; //frame
+
         while(true) {
-            now = System.nanoTime();
-            if (now - lastFrame >= timePerFrame) { //checking if now - last time frame was updated is more/equal to the duration we want a frame to be displayed
-                gamePanel.repaint(); //new frame
-                lastFrame = now;
+            long currentTime = System.nanoTime();
+
+            deltaU += (currentTime - previousTime) / timePerUpdate; //deltaU will be 1 or more when the duration since the last update is equal or more than timePerUpdate
+            deltaU += (currentTime - previousTime) / timePerFrame;
+            previousTime = currentTime;
+
+            if(deltaU >=1) {
+                update();
+                updates++;
+                deltaU--;
+            }
+            if(deltaF >=1){
+                gamePanel.repaint();
                 frames++;
+                deltaF--;
             }
 
 
             if (System.currentTimeMillis() - lastCheck >= 1000) {
                 lastCheck = System.currentTimeMillis();
-                System.out.println("FPS: " + frames);
+                System.out.println("FPS: " + frames + " | UPS: " + updates);
                 frames = 0;
+                updates = 0;
             }
         }
     }
