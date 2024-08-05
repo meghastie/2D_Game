@@ -1,4 +1,4 @@
-package utilz;
+package Utilz;
 
 public class Constants {
 
@@ -45,3 +45,4 @@ public class Constants {
 
     }
 }
+
