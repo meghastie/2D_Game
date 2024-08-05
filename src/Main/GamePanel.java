@@ -3,13 +3,9 @@ package Main;
 import Inputs.KeyboardInputs;
 import Inputs.MouseInputs;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-
+import java.util.Random;
 
 /*
 Think of JFrame as a picture frame, and JPanel as the picture. Think of 'Graphics' object as a paintbrush.
@@ -17,36 +13,17 @@ Think of JFrame as a picture frame, and JPanel as the picture. Think of 'Graphic
 public class GamePanel extends JPanel {
     private MouseInputs mouseInputs;
     private float xDelta = 100, yDelta = 100;
-    private BufferedImage img, subImg;
-
-
+    private float xDir = 1f, yDir = 1f;
+    private int frames = 0;
+    private long lastCheck = 0;
+    private Color color = new Color(150,20,90);
+    private Random random;
     public GamePanel() {
+        random = new Random();
         mouseInputs = new MouseInputs(this); //same instance of class for mouse listener and mouse motion listener
-        importImg();
         addKeyListener(new KeyboardInputs(this)); //KeyboardInputs extends Key Listener, passes in this class
-        setPanelSize(); //set the size of the game window
         addMouseListener(mouseInputs); //deals with when mouse is clicked,pressed,released
         addMouseMotionListener(mouseInputs); // deals with when mouse is moved, dragged (motions)
-    }
-
-    private void importImg() {
-        InputStream is = getClass().getResourceAsStream("/player_sprites.png"); //import the image from res, the / tells the game that the image can be found IN one of the folders, not next to it
-
-        try {
-            img = ImageIO.read(is);
-        } catch (IOException e){
-            e.printStackTrace();
-        }
-    }
-
-    /*
-    had 400x400 in gameWindow, this included border and top bar so playable game window was smaller. jframe will now adjust to size set in panel
-     */
-    private void setPanelSize() {
-        Dimension size = new Dimension(1280,800); //using images that are 32x32
-        setMinimumSize(size);
-        setPreferredSize(size);
-        setMaximumSize(size);
     }
 
     /*
@@ -78,10 +55,34 @@ public class GamePanel extends JPanel {
     public void paintComponent(Graphics g){
         super.paintComponent(g); //erase everything on previous frame to prevent glitching etc, must always call
 
-        subImg = img.getSubimage(1*64,8*40,64,40); //get bottom middle sprite in sprite atlas, each sprite is 64x40 and y axis is 1-8
-        g.drawImage(subImg, (int)xDelta, (int)yDelta, 128, 80, null); //xDelta and yDelta allows us to controlmsprite, have to cast to int
+        updateRectangle();
+        g.setColor(color);
+        g.fillRect((int)xDelta, (int)yDelta, 200, 50);
+
+
+
     }
 
+    public void updateRectangle() {
+        xDelta+= xDir;
+        if (xDelta > 400 || xDelta < 0) {
+            xDir *= -1;
+            color = getRndColor();
+        }
+        yDelta+= yDir;
+        if (yDelta > 400 || yDelta < 0) {
+            yDir *= -1;
+            color = getRndColor();
+        }
+    }
 
+    private Color getRndColor() {
+        int r = random.nextInt(255);
+        int g = random.nextInt(255);
+        int b = random.nextInt(255);
+
+
+        return new Color(r,g,b);
+    }
 
 }
