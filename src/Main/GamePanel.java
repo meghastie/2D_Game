@@ -12,6 +12,8 @@ import java.io.InputStream;
 
 import static Utilz.Constants.PlayerConstants.*;
 import static Utilz.Constants.Directions.*;
+import static Main.Game.GAME_HEIGHT;
+import static Main.Game.GAME_WIDTH;
 
 
 /*
@@ -36,7 +38,7 @@ public class GamePanel extends JPanel {
     had 400x400 in gameWindow, this included border and top bar so playable game window was smaller. jframe will now adjust to size set in panel
      */
     private void setPanelSize() {
-        Dimension size = new Dimension(1280, 800); //using images that are 32x32
+        Dimension size = new Dimension(GAME_WIDTH, GAME_HEIGHT); //using images that are 32x32
         setPreferredSize(size);
     }
 

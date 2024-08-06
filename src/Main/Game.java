@@ -1,6 +1,7 @@
 package Main;
 
 import Entities.Player;
+import Levels.LevelManager;
 
 import java.awt.*;
 
@@ -11,6 +12,18 @@ public class Game implements Runnable {
     private final int FPS_SET = 120; //frames per sec, draws the game scence (level, players, enemies)
     private final int UPS_SET = 200; //updates per sec, takes care of all the game logic (Move player, events etc)
     private Player player;
+    private LevelManager levelManager;
+
+    //Calculate the size of the game window based on tile size
+    public final static int TILE_DEFAULT_SIZE = 32;
+    public final static float SCALE = 1.5f;
+    public final static int TILES_IN_WIDTH = 26;
+    public final static int TILES_IN_HEIGHT = 14;
+    public final static int TILES_SIZE = (int) (TILE_DEFAULT_SIZE * SCALE);
+    public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
+    public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
+
+
     public Game() {
         initClasses(); //have to start before game panel as render is in game panel and player is in render but player is not initialised
         gamePanel = new GamePanel(this);
@@ -21,6 +34,7 @@ public class Game implements Runnable {
 
     private void initClasses() {
         player = new Player(200,200);
+        levelManager = new LevelManager(this);
     }
 
     private void startGameLoop() {
@@ -30,9 +44,11 @@ public class Game implements Runnable {
 
     public void update() {
         player.update();
+        levelManager.update();
     }
 
     public void render(Graphics g){
+        levelManager.draw(g); //render in the level before the player
         player.render(g);
     }
 
