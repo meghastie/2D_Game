@@ -1,5 +1,7 @@
 package Entities;
 
+import Utilz.LoadSave;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -95,11 +97,7 @@ public class Player extends Entity{
     }
 
     private void loadAnimations() {
-
-        InputStream is = getClass().getResourceAsStream("/player_sprites.png"); //import the image from res, the / tells the game that the image can be found IN one of the folders, not next to it
-
-        try {
-            BufferedImage img = ImageIO.read(is);
+            BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
             animations = new BufferedImage[9][6]; //y is 9 (9 down the way), x is 6 (6 along way) on sprite sheet
 
             for (int j = 0; j < animations.length; j++) {
@@ -107,15 +105,6 @@ public class Player extends Entity{
                     animations[j][i] = img.getSubimage(i * 64, j * 40, 64, 40); //each sprite is 64 bits long so 0*64 will get first sprite, 1 *64 will get next, etc. each is 40 long
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public void resetDirBooleans() {
