@@ -5,6 +5,7 @@ import Utilz.LoadSave;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,18 +20,25 @@ public class Player extends Entity{
     private BufferedImage[][] animations;
     private int aniTick, aniIndex, aniSpeed = 15; //anispeed - lower anispeed faster animaton will go
     private int playerAction = IDLE;
-    private boolean left, up, right, down;
+    private boolean left, up, right, down, jump;
     private boolean moving = false, attacking = false;
     private float playerSpeed = 2.0f;
     private int[][] lvlData;
     private float xDrawOffset = 21 * Game.SCALE; //0.0 to 21.x,4y
     private float yDrawoffset = 4 * Game.SCALE;
 
+    //jumping/gravity
+    private float airSpeed = 0f;
+    private float gravity = 0.04f * Game.SCALE; //lower val, higher player can jump
+    private float jumpSpeed= -2.25f * Game.SCALE;
+    private float fallSpeedAfterCollison = 0.5f * Game.SCALE;
+    private boolean inAir = false;
+
 
     public Player(float x, float y, int width, int height) {
         super(x, y, width, height);
         loadAnimations();
-        initHitbox(x,y,20*Game.SCALE,28*Game.SCALE); //player is roughlt 20x28
+        initHitbox(x,y,20*Game.SCALE,27*Game.SCALE); //player is roughlt 20x28
     }
 
     public void update() {
@@ -68,6 +76,15 @@ public class Player extends Entity{
             playerAction = IDLE;
         }
 
+        if (inAir){
+            if (airSpeed < 0){
+                playerAction = JUMP;
+            } else {
+                playerAction = FALLING;
+            }
+
+        }
+
         if (attacking) {
             playerAction = ATTACK_1;
         }
@@ -84,33 +101,75 @@ public class Player extends Entity{
 
     private void updatePos() {
         moving = false; //automatically reset moving - sprite is still
-        if(!left && !right && !up &&!down) { //if not holding down any button, no point in being here
+
+        if (jump){
+            jump();
+        }
+
+        if(!left && !right && !inAir) { //if not holding down any button or in air no point in being here - standng still
             return;
         }
-        float xSpeed = 0, ySpeed = 0; //temp storage of speed in x and y
+        float xSpeed = 0; //temp storage of speed in x dir
         /*
         if pres left&right and up&down at same time, cancel out, so sprite should stay still. if any of the below is true, moving = true, so setAnimation above would set the animation to running
          */
 
 
-        if(left && !right) { //check if pressing just left
-            xSpeed = -playerSpeed;
-        } else if (right && !left) { //check if pressing just right
-            xSpeed = playerSpeed;
+        if(left) { //check if pressing just left
+            xSpeed -= playerSpeed;
         }
 
-        if(up && !down) { //check if pressing just up
-            ySpeed = -playerSpeed;
-        } else if (down && !up) { //check if pressing just right
-            ySpeed = playerSpeed;
+        if (right) { //check if pressing just right
+            xSpeed += playerSpeed;
         }
 
-        if (CanMoveHere(hitbox.x+xSpeed, hitbox.y+ySpeed, hitbox.width, hitbox.height, lvlData)){ //next x pos next y pos, width height & lvlData
+        if (!inAir){
+            if (!IsEntityOnFloor(hitbox, lvlData)){
+                inAir = true;
+            }
+        }
+
+        if (inAir){ //if in air, only need to check in y direction for collisions
+            if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)){
+                hitbox.y += airSpeed; //airSpeed will incrase over time
+                airSpeed += gravity;
+                updateXPos(xSpeed);
+            }else { //if cant move up or down - hitting the roof or hitting the floor
+                hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox,airSpeed);
+                if (airSpeed > 0){
+                    resetInAir();
+                } else { 
+                    airSpeed = fallSpeedAfterCollison;
+                }
+                updateXPos(xSpeed);
+            }
+        }else { //if nt in air only need to check in x dir for collisions
+            updateXPos(xSpeed);
+        }
+        moving = true; //if not moving, will exit at the return sttaement
+    }
+
+
+    private void jump() {
+        if (inAir){
+            return;
+        }
+        inAir = true;
+        airSpeed = jumpSpeed;
+
+    }
+
+    private void resetInAir() {
+        inAir = false;
+        airSpeed = 0;
+    }
+
+    private void updateXPos(float xSpeed) {
+        if (CanMoveHere(hitbox.x+xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData)){ //next x pos next y pos, width height & lvlData - checking if we can move left or right
             hitbox.x += xSpeed;
-            hitbox.y += ySpeed;
-            moving = true;
+        }else {
+            hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed); //if we cant, then we move next o it
         }
-
     }
 
     private void loadAnimations() {
@@ -126,6 +185,9 @@ public class Player extends Entity{
 
     public void loadLvlData(int[][] lvlData) {
         this.lvlData = lvlData;
+        if (!IsEntityOnFloor(hitbox, lvlData)){
+            inAir = true;
+        }
     }
 
 
@@ -170,6 +232,10 @@ public class Player extends Entity{
 
     public void setDown(boolean down) {
         this.down = down;
+    }
+
+    public void setJump(boolean jump) {
+        this.jump = jump;
     }
 }
 
