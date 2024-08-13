@@ -12,9 +12,10 @@ public class Game implements Runnable {
     private final int FPS_SET = 120; //frames per sec, draws the game scence (level, players, enemies)
     private final int UPS_SET = 200; //updates per sec, takes care of all the game logic (Move player, events etc)
     private Player player;
+
     private LevelManager levelManager;
 
-    //Calculate the size of the game window based on tile size
+    //Calculate the size of the game window based on tile size - keep level in good porprotion to window.
     public final static int TILE_DEFAULT_SIZE = 32;
     public final static float SCALE = 2f;
     public final static int TILES_IN_WIDTH = 26;
