@@ -1,5 +1,6 @@
 package Entities;
 
+import Main.Game;
 import Utilz.LoadSave;
 
 import javax.imageio.ImageIO;
@@ -11,6 +12,7 @@ import java.io.InputStream;
 import static Utilz.Constants.Directions.*;
 import static Utilz.Constants.Directions.DOWN;
 import static Utilz.Constants.PlayerConstants.*;
+import static Utilz.HelpMethods.*;
 
 public class Player extends Entity{
 
@@ -20,10 +22,15 @@ public class Player extends Entity{
     private boolean left, up, right, down;
     private boolean moving = false, attacking = false;
     private float playerSpeed = 2.0f;
+    private int[][] lvlData;
+    private float xDrawOffset = 21 * Game.SCALE; //0.0 to 21.x,4y
+    private float yDrawoffset = 4 * Game.SCALE;
+
 
     public Player(float x, float y, int width, int height) {
         super(x, y, width, height);
         loadAnimations();
+        initHitbox(x,y,20*Game.SCALE,28*Game.SCALE); //player is roughlt 20x28
     }
 
     public void update() {
@@ -33,7 +40,8 @@ public class Player extends Entity{
     }
 
     public void render(Graphics g) {
-        g.drawImage(animations[playerAction][aniIndex], (int) x, (int) y, width, height, null); //xDelta and yDelta allows us to control sprite, have to cast to int
+        g.drawImage(animations[playerAction][aniIndex], (int)(hitbox.x - xDrawOffset), (int)(hitbox.y - yDrawoffset), width, height, null); //x and y of hitbox, width and height of sprite
+        //drawHitbox(g);
     }
 
     private void updateAnimationTick() {
@@ -76,21 +84,30 @@ public class Player extends Entity{
 
     private void updatePos() {
         moving = false; //automatically reset moving - sprite is still
+        if(!left && !right && !up &&!down) { //if not holding down any button, no point in being here
+            return;
+        }
+        float xSpeed = 0, ySpeed = 0; //temp storage of speed in x and y
         /*
         if pres left&right and up&down at same time, cancel out, so sprite should stay still. if any of the below is true, moving = true, so setAnimation above would set the animation to running
          */
+
+
         if(left && !right) { //check if pressing just left
-            x-=playerSpeed;
-            moving = true;
+            xSpeed = -playerSpeed;
         } else if (right && !left) { //check if pressing just right
-            x+=playerSpeed;
-            moving = true;
+            xSpeed = playerSpeed;
         }
+
         if(up && !down) { //check if pressing just up
-            y-=playerSpeed;
-            moving = true;
+            ySpeed = -playerSpeed;
         } else if (down && !up) { //check if pressing just right
-            y+=playerSpeed;
+            ySpeed = playerSpeed;
+        }
+
+        if (CanMoveHere(hitbox.x+xSpeed, hitbox.y+ySpeed, hitbox.width, hitbox.height, lvlData)){ //next x pos next y pos, width height & lvlData
+            hitbox.x += xSpeed;
+            hitbox.y += ySpeed;
             moving = true;
         }
 
@@ -106,6 +123,11 @@ public class Player extends Entity{
                 }
             }
     }
+
+    public void loadLvlData(int[][] lvlData) {
+        this.lvlData = lvlData;
+    }
+
 
     public void resetDirBooleans() {
         left = false;
