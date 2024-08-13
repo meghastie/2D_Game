@@ -21,8 +21,8 @@ public class Player extends Entity{
     private boolean moving = false, attacking = false;
     private float playerSpeed = 2.0f;
 
-    public Player(float x, float y) {
-        super(x, y);
+    public Player(float x, float y, int width, int height) {
+        super(x, y, width, height);
         loadAnimations();
     }
 
@@ -33,7 +33,7 @@ public class Player extends Entity{
     }
 
     public void render(Graphics g) {
-        g.drawImage(animations[playerAction][aniIndex], (int) x, (int) y, 256, 160, null); //xDelta and yDelta allows us to control sprite, have to cast to int
+        g.drawImage(animations[playerAction][aniIndex], (int) x, (int) y, width, height, null); //xDelta and yDelta allows us to control sprite, have to cast to int
     }
 
     private void updateAnimationTick() {

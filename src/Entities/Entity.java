@@ -1,9 +1,12 @@
 package Entities;
 
 public abstract class Entity {
-    protected float x, y; //prote cted - only subclasses can use
-    public Entity(float x, float y) {
+    protected float x, y; //protected - only subclasses can use
+    protected int width, height;
+    public Entity(float x, float y, int width, int height) {
         this.x = x;
         this.y =y;
+        this.width = width;
+        this.height = height;
     }
 }
