@@ -6,6 +6,10 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.util.Collections;
 
+/*
+The actual window where the game will be inside
+ */
+
 public class GameWindow {
     private JFrame frame;
     public GameWindow(GamePanel gamePanel) {

@@ -6,7 +6,9 @@ import Utilz.LoadSave;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-
+/*
+Manages the games levels
+ */
 public class LevelManager {
     private Game game;
     private BufferedImage[] levelSprite;

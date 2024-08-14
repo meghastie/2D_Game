@@ -5,12 +5,16 @@ import Levels.LevelManager;
 
 import java.awt.*;
 
+/*
+The core of the Game. Manages the 2D graphics and updating of game logic.
+ */
+
 public class Game implements Runnable {
     private GameWindow gameWindow;
     private GamePanel gamePanel;
     private Thread gameThread;
-    private final int FPS_SET = 120; //frames per sec, draws the game scence (level, players, enemies)
-    private final int UPS_SET = 200; //updates per sec, takes care of all the game logic (Move player, events etc)
+    private final int FPS_SET = 120; //frames per sec, draws the game scence (level, players, enemies). controls how often the game scene is redrawn
+    private final int UPS_SET = 200; //updates per sec, takes care of all the game logic (Move player, events etc). controls how often the game logic is updated
     private Player player;
 
     private LevelManager levelManager;
@@ -44,48 +48,57 @@ public class Game implements Runnable {
         gameThread.start();
     }
 
-    public void update() {
+    public void update() { //updates the game state such as player position and level status
         player.update();
         levelManager.update();
     }
 
-    public void render(Graphics g){
-        levelManager.draw(g); //render in the level before the player
+    /*
+        constant rendering is essential for smooth motion of animation as objects need to be redrawn at every frame, slightly shifted from their previous position.
+        Also, Constant re-rendering ensures that every action by the player is reflected on the screen without delay e.g. pressing buttons, maintaining the responsiveness necessary for an engaging experience
+        The game state (positions of objects, health of characters, score, etc.) changes continuously as a result of the game logic. If the game only rendered once and didn't update the display regularly, these changes wouldn't be visible to the player
+        In summary, constnat renredering allows the game to accurately reflect real-time changes, player interactions, and environmental updates
+         */
+
+    public void render(Graphics g){ //draws the game world, starting with the level and then the player
+        levelManager.draw(g);
         player.render(g);
     }
 
     @Override
     public void run() {
 
-        double timePerFrame = 1000000000.0/FPS_SET; //nanoseconds
-        double timePerUpdate = 1000000000.0/UPS_SET; //time in between updates
+        double timePerFrame = 1000000000.0/FPS_SET; //how long (in nanoseconds) each frame should take based on the desired FPS
+        double timePerUpdate = 1000000000.0/UPS_SET; //how long each update should take based on the desired UPS - time in between updates
 
-        long previousTime = System.nanoTime();
+        long previousTime = System.nanoTime(); //time at strat of the loo[
 
 
         int frames = 0;
         int updates = 0;
         long lastCheck = System.currentTimeMillis();
 
+        //accumulators for update and frame timing - a type of register for short-term intermediate cache storage of arithmetic and logic data in a CPU
         double deltaU = 0; //update
         double deltaF = 0; //frame
 
         while(true) {
             long currentTime = System.nanoTime();
 
+            //track how much time has passed since the last update and frame
             deltaU += (currentTime - previousTime) / timePerUpdate; //deltaU will be 1 or more when the duration since the last update is equal or more than timePerUpdate
             deltaF += (currentTime - previousTime) / timePerFrame;
             previousTime = currentTime;
 
             if(deltaU >=1) {
-                update();
-                updates++;
-                deltaU--;
+                update(); //when enough time has passed to meet the UPS rate, update is called
+                updates++; //this handles player movement, enemy behaviour, other game logic
+                deltaU--; //decreases to reflect an update has occured
             }
             if(deltaF >=1){
-                gamePanel.repaint();
+                gamePanel.repaint(); //will trigger render() which draws the current game state to the screen
                 frames++;
-                deltaF--;
+                deltaF--; //reflects a frame has been rendered
             }
 
 
