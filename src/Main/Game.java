@@ -57,6 +57,9 @@ public class Game implements Runnable {
             case PLAYING://if in playing, will only ever update whats in playing state - go to playing class
                 playing.update();
                 break;
+            case OPTIONS:
+            case QUIT:
+                System.exit(0);
             default:
                 break;
         }

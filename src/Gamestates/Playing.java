@@ -59,6 +59,11 @@ public class Playing extends State implements Statemethods{
     }
 
     @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
             //case KeyEvent.VK_W:
