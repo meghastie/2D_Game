@@ -1,7 +1,8 @@
 package Main;
 
-import Entities.Player;
-import Levels.LevelManager;
+import Gamestates.Gamestate;
+import Gamestates.Playing;
+import Gamestates.Menu;
 
 import java.awt.*;
 
@@ -15,9 +16,9 @@ public class Game implements Runnable {
     private Thread gameThread;
     private final int FPS_SET = 120; //frames per sec, draws the game scence (level, players, enemies). controls how often the game scene is redrawn
     private final int UPS_SET = 200; //updates per sec, takes care of all the game logic (Move player, events etc). controls how often the game logic is updated
-    private Player player;
 
-    private LevelManager levelManager;
+    private Playing playing;
+    private Menu menu;
 
     //Calculate the size of the game window based on tile size - keep level in good porprotion to window.
     public final static int TILE_DEFAULT_SIZE = 32;
@@ -37,10 +38,9 @@ public class Game implements Runnable {
         startGameLoop();
     }
 
-    private void  initClasses() {
-        levelManager = new LevelManager(this);
-        player = new Player(200, 200, (int) (64 * SCALE), (int) (40 * SCALE));
-        player.loadLvlData(levelManager.getCurrentLevel().getLvlData()); //gets lvl data of current lvl. player will now have level data stored
+    private void initClasses() {
+        menu = new Menu(this);
+        playing = new Playing(this);
     }
 
     private void startGameLoop() {
@@ -49,8 +49,17 @@ public class Game implements Runnable {
     }
 
     public void update() { //updates the game state such as player position and level status
-        player.update();
-        levelManager.update();
+
+        switch (Gamestate.state) { //check which state we are in
+            case MENU: //if in menu, will only ever update whats in menu - go to menu class
+                menu.update();
+                break;
+            case PLAYING://if in playing, will only ever update whats in playing state - go to playing class
+                playing.update();
+                break;
+            default:
+                break;
+        }
     }
 
     /*
@@ -60,16 +69,25 @@ public class Game implements Runnable {
         In summary, constnat renredering allows the game to accurately reflect real-time changes, player interactions, and environmental updates
          */
 
-    public void render(Graphics g){ //draws the game world, starting with the level and then the player
-        levelManager.draw(g);
-        player.render(g);
+    public void render(Graphics g) { //draws the game world, starting with the level and then the player
+
+        switch (Gamestate.state) { //check which state we are in
+            case MENU: //if in menu, will only ever render whats in menu - go to menu class
+                menu.draw(g);
+                break;
+            case PLAYING://if in playing, will only ever render whats in playing state - go to playing class
+                playing.draw(g);
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     public void run() {
 
-        double timePerFrame = 1000000000.0/FPS_SET; //how long (in nanoseconds) each frame should take based on the desired FPS
-        double timePerUpdate = 1000000000.0/UPS_SET; //how long each update should take based on the desired UPS - time in between updates
+        double timePerFrame = 1000000000.0 / FPS_SET; //how long (in nanoseconds) each frame should take based on the desired FPS
+        double timePerUpdate = 1000000000.0 / UPS_SET; //how long each update should take based on the desired UPS - time in between updates
 
         long previousTime = System.nanoTime(); //time at strat of the loo[
 
@@ -82,7 +100,7 @@ public class Game implements Runnable {
         double deltaU = 0; //update
         double deltaF = 0; //frame
 
-        while(true) {
+        while (true) {
             long currentTime = System.nanoTime();
 
             //track how much time has passed since the last update and frame
@@ -90,12 +108,12 @@ public class Game implements Runnable {
             deltaF += (currentTime - previousTime) / timePerFrame;
             previousTime = currentTime;
 
-            if(deltaU >=1) {
+            if (deltaU >= 1) {
                 update(); //when enough time has passed to meet the UPS rate, update is called
                 updates++; //this handles player movement, enemy behaviour, other game logic
                 deltaU--; //decreases to reflect an update has occured
             }
-            if(deltaF >=1){
+            if (deltaF >= 1) {
                 gamePanel.repaint(); //will trigger render() which draws the current game state to the screen
                 frames++;
                 deltaF--; //reflects a frame has been rendered
@@ -110,13 +128,19 @@ public class Game implements Runnable {
             }
         }
     }
-
     public void windowFocusLost(){ //if we lose focus of window (e.g. change window), all direction booleans become false - sprite will stop,
-        player.resetDirBooleans();
+        if(Gamestate.state == Gamestate.PLAYING){
+            playing.getPlayer().resetDirBooleans();
+        }
     }
 
-    public Player getPlayer(){
-        return player;
+    public Menu getMenu(){
+        return menu;
     }
+
+    public Playing getPlaying(){
+        return playing;
+    }
+
 
 }
