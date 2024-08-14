@@ -5,7 +5,7 @@ Enum enables for a variable to be a set of predefined constants. Enums are used 
  */
 public enum Gamestate {
 
-    PLAYING, MENU;
+    PLAYING, MENU, OPTIONS, QUIT;
 
     public static Gamestate state = MENU;
 }

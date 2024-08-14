@@ -30,7 +30,7 @@ public abstract class Entity {
         * hitbox will be foundation for collision detection. The actual player will have 4 corners : top left(x,y) , top right(x+width,y), bottom left(x,y+height), bottom right(x+width,y+height)
         * if any of the above points hit a tile, player cannot move there
      */
-    protected void initHitbox(float x, float y, float width,float height) {
+    protected void initHitbox(float x, float y, int width,int height) {
         //first hitbox for entire sprite image
         hitbox = new Rectangle2D.Float(x, y, width, height);
     }
