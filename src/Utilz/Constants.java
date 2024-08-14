@@ -1,5 +1,8 @@
 package Utilz;
 
+/*
+Constant actions we do not wish to change
+ */
 public class Constants {
 
     public static class Directions{
