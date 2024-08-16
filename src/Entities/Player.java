@@ -47,8 +47,8 @@ public class Player extends Entity{
         setAnimation();
     }
 
-    public void render(Graphics g) {
-        g.drawImage(animations[playerAction][aniIndex], (int)(hitbox.x - xDrawOffset), (int)(hitbox.y - yDrawoffset), width, height, null); //x and y of hitbox, width and height of sprite
+    public void render(Graphics g, int lvlOffset) {
+        g.drawImage(animations[playerAction][aniIndex], (int)(hitbox.x - xDrawOffset) - lvlOffset, (int)(hitbox.y - yDrawoffset), width, height, null); //x and y of hitbox, width and height of sprite
         //drawHitbox(g);
     }
 
@@ -106,8 +106,12 @@ public class Player extends Entity{
             jump();
         }
 
-        if(!left && !right && !inAir) { //if not holding down any button or in air no point in being here - standng still
-            return;
+
+
+        if(!inAir){
+            if((!left && !right) || (right && left)){ //if not holding down any button or in air no point in being here - standng still
+                return;
+            }
         }
         float xSpeed = 0; //temp storage of speed in x dir
         /*

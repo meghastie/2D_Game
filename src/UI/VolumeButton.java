@@ -52,6 +52,9 @@ public class VolumeButton extends PauseButton {
         g.drawImage(imgs[index], buttonX - VOLUME_WIDTH/2, y, VOLUME_WIDTH, height, null); //button on slider
     }
 
+    /*
+    used to keep the button within the width of the slider
+     */
     public void changeX(int x){
         if(x < minX){
             buttonX = minX;
