@@ -22,7 +22,8 @@ public class HelpMethods {
     check it is a tile but also check it is within the game window
      */
     private static Boolean IsSolid(float x, float y, int[][] lvlData) {
-        if (x < 0 | x >= Game.GAME_WIDTH) {
+        int maxWidth = lvlData[0].length * Game.TILES_SIZE; //width in pixels of level times the size of a tile - the actual max width of the whole level, notjust visible tiles
+        if (x < 0 | x >= maxWidth) { //if withinh these bounds, it is ok - can check wether we have a walkable tile
             return true; //it is solid - dont go here
         }
         if (y < 0 || y >= Game.GAME_HEIGHT) {

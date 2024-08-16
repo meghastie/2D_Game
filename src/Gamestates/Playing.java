@@ -4,6 +4,7 @@ import Entities.Player;
 import Levels.LevelManager;
 import Main.Game;
 import UI.PauseOverlay;
+import Utilz.LoadSave;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -17,6 +18,13 @@ public class Playing extends State implements Statemethods{
     private LevelManager levelManager;
     private PauseOverlay pauseOverlay;
     private boolean paused = false;
+
+    private int xLvlOffset; //offset we will add and remove to draw everything a but to left or right
+    private int leftBorder = (int) (0.2 * Game.GAME_WIDTH); //line which if player is beyond, we will calculate if screen has to move. e..g is width is 100px and player is below 20px, we need to move the level to the left
+    private int rightBorder = (int) (0.8 * Game.GAME_WIDTH); //same as above but 80%
+    private int lvlTilesWide = LoadSave.GetLevelData()[0].length;//HOW MANY TILES WIDE THE WHOLEELEVEL IS - getting image width with .length . used to calulate max offset
+    private int maxTilesOffset = lvlTilesWide - Game.TILES_IN_WIDTH; ////need a max val offset can be - dont want to move screen if there is nothing to move to.
+    private int maxLvlOffsetX = maxTilesOffset * Game.TILES_SIZE; //turn maxTilesOffset into pixels
 
     public Playing(Game game) {
         super(game);
@@ -35,17 +43,37 @@ public class Playing extends State implements Statemethods{
         if(!paused){
             levelManager.update();
             player.update();
+            checkCloseToBorder();
         }else{
             pauseOverlay.update();
         }
     }
 
+    private void checkCloseToBorder() {
+        int playerX = (int) player.getHitbox().x; //get player
+        int diff = playerX - xLvlOffset; //if its more than right border, have to move player to rght. vice versa than lesthan left border
+
+        if(diff > rightBorder){
+            xLvlOffset += diff - rightBorder; //if player at 85 and offset 0, 85-0 = 85. if (85>80) offest+= 85-80 ---> offset + 5. if havent moved player is 85, offset 5, 80 not > 80.
+        } else if(diff < leftBorder){
+            xLvlOffset += diff - leftBorder; //player 30 and offset 15. 30 - 15 = 15, if(15<20) 30+= 15 - 20 ---> 30 - 5
+        }
+
+        if(xLvlOffset > maxLvlOffsetX){ //ensure it doesnt go beyond bounds of level
+            xLvlOffset = maxLvlOffsetX;
+        } else if(xLvlOffset < 0){
+            xLvlOffset = 0;
+        }
+    }
+
     @Override
     public void draw(Graphics g) {
-        levelManager.draw(g);
-        player.render(g);
+        levelManager.draw(g, xLvlOffset);
+        player.render(g, xLvlOffset);
 
         if (paused) {
+            g.setColor(new Color(0,0,0,150));
+            g.fillRect(0,0,Game.GAME_WIDTH, Game.GAME_HEIGHT);
             pauseOverlay.draw(g);
         }
     }
