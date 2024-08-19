@@ -1,5 +1,6 @@
 package Utilz;
 
+import Entities.Crabby;
 import Main.Game;
 
 import javax.imageio.ImageIO;
@@ -7,6 +8,9 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+
+import static Utilz.Constants.EnemyConstants.CRABBY;
 
 /*
 Gets our inputs, like the levels and sprites.
@@ -26,6 +30,7 @@ public class LoadSave {
     public static final String PLAYING_BG_IMG = "playing_bg_img.png";
     public static final String BIG_CLOUDS = "big_clouds.png";
     public static final String SMALL_CLOUDS = "small_clouds.png";
+    public static final String CRABBY_SPRITE = "crabby_sprite.png";
 
     public static BufferedImage GetSpriteAtlas(String fileName) {
         BufferedImage img = null;
@@ -43,6 +48,7 @@ public class LoadSave {
         }
         return img;
     }
+
 
     /*
     he code takes a picture where each dot represents a part of your game world.
@@ -68,5 +74,24 @@ public class LoadSave {
             }
         }
         return lvlData;
+    }
+
+    /*
+    Go over image. if we find colour where green va.lue = crabby (0), then we add a crabby at that pos to the list the return the list.
+     */
+    public static ArrayList<Crabby> GetCrabs(){
+        BufferedImage img = GetSpriteAtlas(LEVEL_ONE_DATA);
+        ArrayList<Crabby> list = new ArrayList<>();
+
+        for (int i = 0; i < img.getHeight(); i++){
+            for (int j = 0; j < img.getWidth(); j++){
+                Color color = new Color(img.getRGB(j,i));
+                int value = color.getGreen();
+                if(value == CRABBY) {
+                    list.add(new Crabby(j * Game.TILES_SIZE, i * Game.TILES_SIZE));
+                }
+            }
+        }
+        return list;
     }
 }
