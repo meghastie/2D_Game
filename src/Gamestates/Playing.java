@@ -1,5 +1,6 @@
 package Gamestates;
 
+import Entities.EnemyManager;
 import Entities.Player;
 import Levels.LevelManager;
 import Main.Game;
@@ -12,7 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-import static  Utilz.Constants.UI.Environment.*;
+import static Utilz.Constants.Environment.*;
 
 /*
 Current game scene which we have
@@ -20,6 +21,7 @@ Current game scene which we have
 public class Playing extends State implements Statemethods{
     private Player player;
     private LevelManager levelManager;
+    private EnemyManager enemyManager;
     private PauseOverlay pauseOverlay;
     private boolean paused = false;
 
@@ -49,6 +51,7 @@ public class Playing extends State implements Statemethods{
 
     private void  initClasses() {
         levelManager = new LevelManager(game);
+        enemyManager = new EnemyManager(this); //ask for playing class and not the game class
         player = new Player(200, 200, (int) (64 * Game.SCALE), (int) (40 * Game.SCALE));
         player.loadLvlData(levelManager.getCurrentLevel().getLvlData()); //gets lvl data of current lvl. player will now have level data stored
         pauseOverlay = new PauseOverlay(this);
@@ -59,6 +62,7 @@ public class Playing extends State implements Statemethods{
         if(!paused){
             levelManager.update();
             player.update();
+            enemyManager.update();
             checkCloseToBorder();
         }else{
             pauseOverlay.update();
@@ -89,6 +93,7 @@ public class Playing extends State implements Statemethods{
         
         levelManager.draw(g, xLvlOffset);
         player.render(g, xLvlOffset);
+        enemyManager.draw(g, xLvlOffset);
 
         if (paused) {
             g.setColor(new Color(0,0,0,150));
