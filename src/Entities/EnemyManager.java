@@ -29,9 +29,9 @@ public class EnemyManager {
         System.out.println("size of crabs: " + crabbies.size());
     }
 
-    public void update() {
+    public void update(int[][] lvlData) {
         for (Crabby c : crabbies)
-            c.update();
+            c.update(lvlData);
     }
 
     public void draw(Graphics g, int xLvlOffset) {
@@ -40,7 +40,13 @@ public class EnemyManager {
 
     private void drawCrabs(Graphics g, int xLvlOffset) {
         for (Crabby c : crabbies)
-            g.drawImage(crabbyArr[c.getEnemyState()][c.getAniIndex()], (int) c.getHitbox().x - xLvlOffset, (int) c.getHitbox().y, CRABBY_WIDTH, CRABBY_HEIGHT, null);
+            g.drawImage(crabbyArr[c.getEnemyState()][c.getAniIndex()], (int) (c.getHitbox().x - CRABBY_DRAWOFFSET_X) - xLvlOffset, (int) (c.getHitbox().y- CRABBY_DRAWOFFSET_Y), CRABBY_WIDTH, CRABBY_HEIGHT, null);
+            /*
+            crabbyArray[c.getEnemyState()][c.getAniIndex()]: This represents the current frame of the crabby entity's animation based on its state and animation index.
+            (int) (c.getHitbox().x - CRABBY_DRAWOFFSET_X): The X-coordinate where the image will be drawn. The c.getHitbox().x gives the X-coordinate of the entity's hitbox, and CRABBY_DRAWOFFSET_X is subtracted as an offset. - xLvlOffset: Further adjusts the X-coordinate based on the level's offset, which is likely used to manage scrolling or camera movement.
+            (int) (c.getHitbox().y - CRABBY_DRAWOFFSET_Y): Similar to the X-coordinate, but for the Y-coordinate.
+            CRABBY_WIDTH and CRABBY_HEIGHT: These define the width and height of the image to be drawn.
+             */
 
     }
 

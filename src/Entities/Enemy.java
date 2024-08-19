@@ -1,43 +1,106 @@
 package Entities;
 
+import static Utilz.Constants.EnemyConstants.*;
+import static Utilz.HelpMethods.*;
+import static Utilz.Constants.Directions.*;
+
+import Main.Game;
+
 /*
-main class for all enemies
+super class for all enemies
  */
 
-import static Utilz.Constants.EnemyConstants.*;
-public abstract class Enemy extends Entity{
+public abstract class Enemy extends Entity {
     private int aniIndex, enemyState, enemyType;
     private int aniTick, aniSpeed = 25;
+    private boolean firstUpdate = true;
+    private boolean inAir;
+    private float fallSpeed;
+    private float gravity = 0.04f * Game.SCALE;
+    private float walkSpeed = 0.35f * Game.SCALE;
+    private int walkDir = LEFT;
+
     public Enemy(float x, float y, int width, int height, int enemyType) {
         super(x, y, width, height);
         this.enemyType = enemyType;
-        initHitbox(x,y,width,height);
+        initHitbox(x, y, width, height);
+
     }
 
-    private void updateAnimationTick(){
+    private void updateAnimationTick() {
         aniTick++;
-        if (aniTick >= aniSpeed){
+        if (aniTick >= aniSpeed) {
             aniTick = 0;
             aniIndex++;
-            if(aniIndex >= GetSpriteAmount(enemyType, enemyState)){
+            if (aniIndex >= GetSpriteAmount(enemyType, enemyState)) {
                 aniIndex = 0;
             }
         }
     }
 
-    public void update(){
+    public void update(int[][] lvlData) {
+        updateMove(lvlData);
         updateAnimationTick();
+
     }
 
-    public int getAniIndex(){
+    private void updateMove(int[][] lvlData) {
+        if (firstUpdate) {
+            if (!IsEntityOnFloor(hitbox, lvlData))
+                inAir = true;
+            firstUpdate = false;
+        }
+
+        if (inAir) { //enemy will fall to floor and never be in air again
+            if (CanMoveHere(hitbox.x, hitbox.y + fallSpeed, hitbox.width, hitbox.height, lvlData)) {
+                hitbox.y += fallSpeed;
+                fallSpeed += gravity;
+            } else {
+                inAir = false;
+                hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, fallSpeed);
+            }
+        } else {
+            switch (enemyState) {
+                case IDLE:
+                    enemyState = RUNNING;
+                    break;
+                case RUNNING:
+                    float xSpeed = 0;
+
+                    if (walkDir == LEFT)
+                        xSpeed = -walkSpeed;
+                    else
+                        xSpeed = walkSpeed;
+
+                    if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData))
+                        if (IsFloor(hitbox, xSpeed, lvlData)) {
+                            hitbox.x += xSpeed;
+                            return; //if both above true, we have the return here so never enter the else below (change dir)
+                        }
+
+                    changeWalkDir(); //will only get here if either of the two above if statemenrs return false
+
+
+                    break;
+            }
+        }
+
+    }
+
+    private void changeWalkDir() {
+        if (walkDir == LEFT)
+            walkDir = RIGHT;
+        else
+            walkDir = LEFT;
+
+    }
+
+    public int getAniIndex() {
         return aniIndex;
     }
 
-    public int getEnemyState(){
+    public int getEnemyState() {
         return enemyState;
     }
 
-
-
 }
-
