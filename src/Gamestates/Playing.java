@@ -4,12 +4,14 @@ import Entities.EnemyManager;
 import Entities.Player;
 import Levels.LevelManager;
 import Main.Game;
+import UI.GameOverOverlay;
 import UI.PauseOverlay;
 import Utilz.LoadSave;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
@@ -23,6 +25,7 @@ public class Playing extends State implements Statemethods{
     private LevelManager levelManager;
     private EnemyManager enemyManager;
     private PauseOverlay pauseOverlay;
+    private GameOverOverlay gameOverOverlay;
     private boolean paused = false;
 
     private int xLvlOffset; //offset we will add and remove to draw everything a but to left or right
@@ -35,6 +38,8 @@ public class Playing extends State implements Statemethods{
     private BufferedImage backgroundImg, bigCloud, smallCloud;
     private int[] smallCloudsPos;
     private Random rnd = new Random();
+
+    private boolean gameOver = false;
 
     public Playing(Game game) {
         super(game);
@@ -52,14 +57,15 @@ public class Playing extends State implements Statemethods{
     private void  initClasses() {
         levelManager = new LevelManager(game);
         enemyManager = new EnemyManager(this); //ask for playing class and not the game class
-        player = new Player(200, 200, (int) (64 * Game.SCALE), (int) (40 * Game.SCALE));
+        player = new Player(200, 200, (int) (64 * Game.SCALE), (int) (40 * Game.SCALE), this);
         player.loadLvlData(levelManager.getCurrentLevel().getLvlData()); //gets lvl data of current lvl. player will now have level data stored
         pauseOverlay = new PauseOverlay(this);
+        gameOverOverlay = new GameOverOverlay(this);
     }
 
     @Override
     public void update() {
-        if(!paused){
+        if(!paused && !gameOver){
             levelManager.update();
             player.update();
             enemyManager.update(levelManager.getCurrentLevel().getLvlData(), player);
@@ -87,7 +93,7 @@ public class Playing extends State implements Statemethods{
     }
 
     @Override
-    public void draw(Graphics g) {
+    public void  draw(Graphics g) {
         g.drawImage(backgroundImg, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
         drawClouds(g);
         
@@ -99,6 +105,8 @@ public class Playing extends State implements Statemethods{
             g.setColor(new Color(0,0,0,150));
             g.fillRect(0,0,Game.GAME_WIDTH, Game.GAME_HEIGHT);
             pauseOverlay.draw(g);
+        }else if(gameOver){
+            gameOverOverlay.draw(g);
         }
     }
 
@@ -114,6 +122,21 @@ public class Playing extends State implements Statemethods{
 
     }
 
+    public void resetAll(){
+        gameOver = false;
+        paused = false;
+        player.resetAll();
+        enemyManager.resetAllEnemies();
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public void checkEnemyHit(Rectangle2D.Float attackBox){
+        enemyManager.checkEnemyHit(attackBox);
+    }
+
     /*
     Inputs have been moved over
      */
@@ -126,22 +149,28 @@ public class Playing extends State implements Statemethods{
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(paused){
-            pauseOverlay.mouseReleased(e);
+        if(!gameOver){
+            if(paused){
+                pauseOverlay.mouseReleased(e);
+            }
         }
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        if(paused){
-            pauseOverlay.mouseMoved(e);
+        if(!gameOver){
+            if(paused){
+                pauseOverlay.mouseMoved(e);
+            }
         }
     }
 
 
     public void mouseDragged(MouseEvent e){
-        if(paused){
-            pauseOverlay.mouseDragged(e);
+        if(!gameOver){
+            if(paused){
+                pauseOverlay.mouseDragged(e);
+            }
         }
     }
 
@@ -149,54 +178,62 @@ public class Playing extends State implements Statemethods{
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(paused){
-            pauseOverlay.mousePressed(e);
+        if(!gameOver){
+            if(paused){
+                pauseOverlay.mousePressed(e);
+            }
         }
 
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            //case KeyEvent.VK_W:
-            //  gamePanel.getGame().getPlayer().setUp(true); //move UP
-            //break;
-            case KeyEvent.VK_A:
-                player.setLeft(true); //move LEFT
-                break;
-            // case KeyEvent.VK_S:
-            //   gamePanel.getGame().getPlayer().setDown(true); //move DOWN
-            // break;
-            case KeyEvent.VK_D:
-                player.setRight(true); //move RIGHT
-                break;
-            case KeyEvent.VK_SPACE:
-                player.setJump(true); //jump
-                break;
-            case KeyEvent.VK_ESCAPE:
-                paused = !paused;
-                break;
+        if (gameOver){
+            gameOverOverlay.keyPressed(e);
+        }else {
+            switch (e.getKeyCode()) {
+                //case KeyEvent.VK_W:
+                //  gamePanel.getGame().getPlayer().setUp(true); //move UP
+                //break;
+                case KeyEvent.VK_A:
+                    player.setLeft(true); //move LEFT
+                    break;
+                // case KeyEvent.VK_S:
+                //   gamePanel.getGame().getPlayer().setDown(true); //move DOWN
+                // break;
+                case KeyEvent.VK_D:
+                    player.setRight(true); //move RIGHT
+                    break;
+                case KeyEvent.VK_SPACE:
+                    player.setJump(true); //jump
+                    break;
+                case KeyEvent.VK_ESCAPE:
+                    paused = !paused;
+                    break;
+            }
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        switch (e.getKeyCode()) {
-            //case KeyEvent.VK_W:
-            //  gamePanel.getGame().getPlayer().setUp(false); //UP
-            //break;
-            case KeyEvent.VK_A:
-                player.setLeft(false); //LEFT
-                break;
-            //case KeyEvent.VK_S:
-            //  gamePanel.getGame().getPlayer().setDown(false); //DOWN
-            //break;
-            case KeyEvent.VK_D:
-                player.setRight(false); //RIGHT
-                break;
-            case KeyEvent.VK_SPACE:
-                player.setJump(false);
-                break;
+        if(!gameOver){
+            switch (e.getKeyCode()) {
+                //case KeyEvent.VK_W:
+                //  gamePanel.getGame().getPlayer().setUp(false); //UP
+                //break;
+                case KeyEvent.VK_A:
+                    player.setLeft(false); //LEFT
+                    break;
+                //case KeyEvent.VK_S:
+                //  gamePanel.getGame().getPlayer().setDown(false); //DOWN
+                //break;
+                case KeyEvent.VK_D:
+                    player.setRight(false); //RIGHT
+                    break;
+                case KeyEvent.VK_SPACE:
+                    player.setJump(false);
+                    break;
+            }
         }
     }
 
@@ -212,4 +249,6 @@ public class Playing extends State implements Statemethods{
     public Player getPlayer(){
         return player;
     }
+
+
 }
