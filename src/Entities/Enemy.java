@@ -1,6 +1,8 @@
 package Entities;
 
+import static Utilz.Constants.ANI_SPEED;
 import static Utilz.Constants.EnemyConstants.*;
+import static Utilz.Constants.GRAVITY;
 import static Utilz.HelpMethods.*;
 import static Utilz.Constants.Directions.*;
 
@@ -13,12 +15,10 @@ super class for all enemies
  */
 
 public abstract class Enemy extends Entity {
-    protected int aniIndex, enemyState, enemyType;
-    protected int aniTick, aniSpeed = 25;
+    protected int enemyState, enemyType;
     protected boolean firstUpdate = true;
     protected boolean inAir;
     protected float fallSpeed;
-    protected float gravity = 0.04f * Game.SCALE;
     protected float walkSpeed = 0.35f * Game.SCALE;
     protected int walkDir = LEFT;
     protected int tileY;
@@ -47,7 +47,7 @@ public abstract class Enemy extends Entity {
     protected void updateInAir(int[][] lvlData){
             if (CanMoveHere(hitbox.x, hitbox.y + fallSpeed, hitbox.width, hitbox.height, lvlData)) {
                 hitbox.y += fallSpeed;
-                fallSpeed += gravity;
+                fallSpeed += GRAVITY;
             } else {
                 inAir = false;
                 hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, fallSpeed);
@@ -128,7 +128,7 @@ public abstract class Enemy extends Entity {
 
     protected void updateAnimationTick() {
         aniTick++;
-        if (aniTick >= aniSpeed) {
+        if (aniTick >= ANI_SPEED) {
             aniTick = 0;
             aniIndex++;
             if (aniIndex >= GetSpriteAmount(enemyType, enemyState)) {

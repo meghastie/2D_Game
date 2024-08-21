@@ -7,6 +7,9 @@ Constant actions we do not wish to change
  */
 public class Constants {
 
+    public static final float GRAVITY = 0.04f * Game.SCALE; //lower val, higher player can jump
+    public static final int ANI_SPEED = 25; //anispeed - lower anispeed faster animaton will go
+
     public static class UI{
         public static class Buttons{
             public static final int B_WIDTH_DEFAULT = 140;

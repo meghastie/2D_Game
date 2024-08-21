@@ -11,15 +11,17 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static Utilz.Constants.ANI_SPEED;
 import static Utilz.Constants.Directions.*;
 import static Utilz.Constants.Directions.DOWN;
+import static Utilz.Constants.GRAVITY;
 import static Utilz.Constants.PlayerConstants.*;
 import static Utilz.HelpMethods.*;
 
 public class Player extends Entity{
 
     private BufferedImage[][] animations;
-    private int aniTick, aniIndex, aniSpeed = 15; //anispeed - lower anispeed faster animaton will go
+    private int aniTick, aniIndex;
     private int playerAction = IDLE;
     private boolean left, up, right, down, jump;
     private boolean moving = false, attacking = false;
@@ -30,7 +32,6 @@ public class Player extends Entity{
 
     //jumping/gravity
     private float airSpeed = 0f;
-    private float gravity = 0.04f * Game.SCALE; //lower val, higher player can jump
     private float jumpSpeed= -2.25f * Game.SCALE;
     private float fallSpeedAfterCollison = 0.5f * Game.SCALE;
     private boolean inAir = false;
@@ -142,7 +143,7 @@ public class Player extends Entity{
     private void updateAnimationTick() {
 
         aniTick++;
-        if (aniTick >= aniSpeed) {
+        if (aniTick >= ANI_SPEED) {
             aniTick = 0;
             aniIndex++;
             if (aniIndex >= GetSpriteAmount(playerAction)) { //before we had this as >= 6, which would cause sprite to glitch as some actions have less than 6 sprite animations
@@ -231,7 +232,7 @@ public class Player extends Entity{
         if (inAir){ //if in air, only need to check in y direction for collisions
             if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)){
                 hitbox.y += airSpeed; //airSpeed will incrase over time
-                airSpeed += gravity;
+                airSpeed += GRAVITY;
                 updateXPos(xSpeed);
             }else { //if cant move up or down - hitting the roof or hitting the floor
                 hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox,airSpeed);

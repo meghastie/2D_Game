@@ -65,7 +65,7 @@ public class LoadSave {
         File[] files = file.listFiles(); //will get all files inside the directorty
         File[] filesSorted = new File[files.length];
 
-        for (int i = 0; i < filesSorted.length; i++){
+        for (int i = 0; i < filesSorted.length; i++){ //sort the files in level order
             for (int j = 0; j < filesSorted.length; j++){
                 if(files[j].getName().equals((i + 1) + ".png")){
                     filesSorted[i] = files[j];
