@@ -2,6 +2,7 @@ package Entities;
 
 import Gamestates.Playing;
 import Main.Game;
+import Objects.Potion;
 import Utilz.LoadSave;
 
 import javax.imageio.ImageIO;
@@ -91,11 +92,18 @@ public class Player extends Entity{
         updateAttackBox();
 
         updatePos();
+        if(moving){
+            checkPotionTouched();
+        }
         if(attacking){
             checkAttack();
         }
         updateAnimationTick();
         setAnimation();
+    }
+
+    private void checkPotionTouched() {
+        playing.checkPotionTouched(hitbox);
     }
 
     private void checkAttack() { //check we are on correct sprite index and we haven checked before
@@ -104,6 +112,7 @@ public class Player extends Entity{
         }
         attackChecked = true;
         playing.checkEnemyHit(attackBox);
+        playing.checkObjectHit(attackBox);
 
     }
 
@@ -263,6 +272,10 @@ public class Player extends Entity{
         }else {
             hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed); //if we cant, then we move next o it
         }
+    }
+
+    public void changePower(int value){
+        System.out.println("Blue Potion");
     }
 
     public void changeHealth(int value){

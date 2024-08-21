@@ -36,6 +36,7 @@ public class LevelManager {
             game.getPlaying().getEnemyManager().loadEnemies(newLevel); //load the enmeies in the new level
             game.getPlaying().getPlayer().loadLvlData(newLevel.getLvlData()); //need to acess player in the level. player needs lvlData for hitboxes, terrain etc
             game.getPlaying().setMaxLvlOffset(newLevel.getMaxLvlOffsetX()); //set current level offset
+            game.getPlaying().getObjectManager().loadObjects(newLevel);
 
     }
 
