@@ -1,8 +1,14 @@
 package Utilz;
 
+import Entities.Crabby;
 import Main.Game;
 
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+
+import static Utilz.Constants.EnemyConstants.CRABBY;
 
 public class HelpMethods {
 
@@ -95,7 +101,11 @@ public class HelpMethods {
     }
 
     public static boolean IsFloor(Rectangle2D.Float hitbox, float xSpeed, int[][] lvlData) {
-        return IsSolid(hitbox.x + xSpeed, hitbox.y + hitbox.height + 1, lvlData); //if its solid we can walk ther. hitbox.y + hitbox.height + 1 - not checking hitbox, checking pixel below
+        if(xSpeed > 0){
+            return IsSolid(hitbox.x + hitbox.width + xSpeed, hitbox.y + hitbox.height + 1, lvlData);
+        }else {
+            return IsSolid(hitbox.x + xSpeed, hitbox.y + hitbox.height + 1, lvlData); //if its solid we can walk ther. hitbox.y + hitbox.height + 1 - not checking hitbox, checking pixel below
+        }
     }
 
     public static boolean IsSightClear(int[][] lvlData, Rectangle2D.Float firstHitbox, Rectangle2D.Float secondHitbox, int yTile) { //in helper methods as may be used for things like projectiles etc. other classes will use apart form enemy
@@ -108,5 +118,60 @@ public class HelpMethods {
             return IsAllTilesWalkable(firstXTile, secondXTile, yTile, lvlData);
         }
     }
+
+    /*
+    he code takes a picture where each dot represents a part of your game world.
+    It checks how red each dot is, uses that information to decide what type of tile belongs there (e.g. grass, water, lava...), and then builds a level for your game based on that picture.
+    Think of your game level as an image where each tiny dot (pixel) in the picture represents a single square (tile) in your game.
+    The color of the dot (let’s say how red it is) tells the computer what type of tile goes there
+    The code looks at each dot (pixel) in the image and checks how red it is. It then makes a note in a big grid (a 2D array) about what kind of tile each square should be based on how red the pixel is.
+     */
+    public static int[][] GetLevelData(BufferedImage img){
+        int[][] lvlData = new int[img.getHeight()][img.getWidth()]; //lvl data will be same size as acual whole leve - not just visible tiles
+        //This array will eventually hold the indices for the sprites that represent different tiles in the game level
+
+        for (int i = 0; i < img.getHeight(); i++){ //The nested for loops are used to traverse every pixel in the image:
+            for (int j = 0; j < img.getWidth(); j++){ //i represents the current row (height or y-axis) and j represents the current column (width or x-axis). This means the loops are iterating over each pixel in the image from top to bottom and left to right.
+                Color color = new Color(img.getRGB(j,i)); //For each pixel at position (j, i), the code retrieves the RGB color value of that pixel using img.getRGB(j, i).
+                int value = color.getRed(); //whatever value red is will be index later for that sprite - This red value will be used to determine what kind of tile or sprite should be placed at that location in the level
+                if(value >= 48) { //if greater than 48 that index does not exist in sprite atlas (think outsides_sprites.png screenshot, 4 height x 12 width = 48)
+                    value = 0;
+                }
+                lvlData[i][j] = value;
+            }
+        }
+        return lvlData;
+    }
+
+    /*
+    Go over image. if we find colour where green va.lue = crabby (0), then we add a crabby at that pos to the list the return the list.
+     */
+    public static ArrayList<Crabby> GetCrabs(BufferedImage img){
+        ArrayList<Crabby> list = new ArrayList<>();
+        for (int i = 0; i < img.getHeight(); i++){
+            for (int j = 0; j < img.getWidth(); j++){
+                Color color = new Color(img.getRGB(j,i));
+                int value = color.getGreen();
+                if(value == CRABBY) {
+                    list.add(new Crabby(j * Game.TILES_SIZE, i * Game.TILES_SIZE));
+                }
+            }
+        }
+        return list;
+    }
+
+    public static Point GetPlayerSpawn(BufferedImage img){
+        for (int i = 0; i < img.getHeight(); i++){
+            for (int j = 0; j < img.getWidth(); j++){
+                Color color = new Color(img.getRGB(j,i));
+                int value = color.getGreen();
+                if(value == 100) {
+                    return new Point(j * Game.TILES_SIZE, i * Game.TILES_SIZE);
+                }
+            }
+        }
+        return new Point(1 * Game.TILES_SIZE, 1 * Game.TILES_SIZE);
+    }
+
 
 }

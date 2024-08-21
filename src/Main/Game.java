@@ -34,7 +34,9 @@ public class Game implements Runnable {
         initClasses(); //have to start before game panel as render is in game panel and player is in render but player is not initialised
         gamePanel = new GamePanel(this);
         gameWindow = new GameWindow(gamePanel); //pass in panel to window so can see actual graphics
+        gamePanel.setFocusable(true); //making sure inputs work as they should
         gamePanel.requestFocus(); //used to get input
+
         startGameLoop();
     }
 

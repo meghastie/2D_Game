@@ -9,7 +9,7 @@ import static Utilz.Constants.UI.URMButtons.*;
 public class UrmButton extends PauseButton{
     private BufferedImage[] imgs;
     private int rowIndex, index;
-    private boolean mouseOver, mousePressed;
+    private boolean mouseOver = false, mousePressed;
     public UrmButton(int x, int y, int width, int height, int rowIndex) {
         super(x, y, width, height);
         this.rowIndex = rowIndex;
@@ -25,6 +25,7 @@ public class UrmButton extends PauseButton{
     }
 
     public void update(){
+        index = 0;
         if(mouseOver){
             index = 1;
         }
