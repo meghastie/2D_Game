@@ -15,25 +15,20 @@ super class for all enemies
  */
 
 public abstract class Enemy extends Entity {
-    protected int enemyState, enemyType;
+    protected int enemyType;
     protected boolean firstUpdate = true;
-    protected boolean inAir;
-    protected float fallSpeed;
-    protected float walkSpeed = 0.35f * Game.SCALE;
     protected int walkDir = LEFT;
     protected int tileY;
     protected float attackDistance = Game.TILES_SIZE; //attack distance is size of a tile
-    protected int maxHealth;
-    protected int currentHealth;
     protected boolean active = true; //enemy s active when we start game
     protected boolean attackChecked;
 
     public Enemy(float x, float y, int width, int height, int enemyType) {
         super(x, y, width, height);
         this.enemyType = enemyType;
-        initHitbox(x, y, width, height);
         maxHealth = GetMaxHealth(enemyType);
         currentHealth = maxHealth;
+        walkSpeed = Game.SCALE * 0.35f;
 
     }
 
@@ -45,12 +40,12 @@ public abstract class Enemy extends Entity {
     }
 
     protected void updateInAir(int[][] lvlData){
-            if (CanMoveHere(hitbox.x, hitbox.y + fallSpeed, hitbox.width, hitbox.height, lvlData)) {
-                hitbox.y += fallSpeed;
-                fallSpeed += GRAVITY;
+            if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
+                hitbox.y += airSpeed;
+                airSpeed += GRAVITY;
             } else {
                 inAir = false;
-                hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, fallSpeed);
+                hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, airSpeed);
                 tileY = (int) (hitbox.y / Game.TILES_SIZE); //GET TILE Y FOR ENEMY WHICH WILL NEVER CHANGE
             }
     }
@@ -105,7 +100,7 @@ public abstract class Enemy extends Entity {
     }
 
     protected void newState(int enemyState){
-        this.enemyState = enemyState;
+        this.state = enemyState;
         aniTick = 0;
         aniIndex = 0;
     }
@@ -131,11 +126,11 @@ public abstract class Enemy extends Entity {
         if (aniTick >= ANI_SPEED) {
             aniTick = 0;
             aniIndex++;
-            if (aniIndex >= GetSpriteAmount(enemyType, enemyState)) {
+            if (aniIndex >= GetSpriteAmount(enemyType, state)) {
                 aniIndex = 0;
 
-                switch (enemyState){
-                    case ATTACK,HIT -> enemyState = IDLE;
+                switch (state){
+                    case ATTACK,HIT -> state = IDLE;
                     case DEAD -> active = false; //if enemy dies, its no longer active,we dont want to update them etc
                 }
             }
@@ -157,15 +152,7 @@ public abstract class Enemy extends Entity {
         currentHealth = maxHealth;
         newState(IDLE);
         active = true;
-        fallSpeed = 0;
-    }
-
-    public int getAniIndex() {
-        return aniIndex;
-    }
-
-    public int getEnemyState() {
-        return enemyState;
+        airSpeed = 0;
     }
 
     public boolean isActive() {
