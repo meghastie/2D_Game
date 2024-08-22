@@ -4,6 +4,7 @@ import Entities.Crabby;
 import Main.Game;
 import Objects.GameContainer;
 import Objects.Potion;
+import Objects.Spike;
 import Utilz.HelpMethods;
 
 import java.awt.*;
@@ -27,6 +28,7 @@ public class Level {
     private Point playerSpawn;
     private ArrayList<Potion> potions;
     private ArrayList<GameContainer> containers;
+    private ArrayList<Spike> spikes;
 
     public Level(BufferedImage img) {
         this.img = img;
@@ -34,8 +36,13 @@ public class Level {
         createEnemies();
         createPotions();
         createContainers();
+        createSpikes();
         calcLvlOffsets();
         calcPlayerSpawn();
+    }
+
+    private void createSpikes() {
+        spikes = HelpMethods.GetSpikes(img);
     }
 
     private void createContainers() {
@@ -91,6 +98,10 @@ public class Level {
 
     public ArrayList<GameContainer> getContainers(){
         return containers;
+    }
+
+    public ArrayList<Spike> getSpikes(){
+        return spikes;
     }
 
 
