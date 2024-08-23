@@ -2,6 +2,7 @@ package Levels;
 
 import Entities.Crabby;
 import Main.Game;
+import Objects.Cannon;
 import Objects.GameContainer;
 import Objects.Potion;
 import Objects.Spike;
@@ -29,6 +30,7 @@ public class Level {
     private ArrayList<Potion> potions;
     private ArrayList<GameContainer> containers;
     private ArrayList<Spike> spikes;
+    private ArrayList<Cannon> cannons;
 
     public Level(BufferedImage img) {
         this.img = img;
@@ -37,8 +39,13 @@ public class Level {
         createPotions();
         createContainers();
         createSpikes();
+        createCannons();
         calcLvlOffsets();
         calcPlayerSpawn();
+    }
+
+    private void createCannons() {
+        cannons = HelpMethods.GetCannons(img);
     }
 
     private void createSpikes() {
@@ -84,6 +91,9 @@ public class Level {
         return maxLvlOffsetX;
     }
 
+    /*
+    Need these getters so we can get the objects in ObjectManager
+     */
     public ArrayList<Crabby> getCrabs() {
         return crabs;
     }
@@ -103,6 +113,13 @@ public class Level {
     public ArrayList<Spike> getSpikes(){
         return spikes;
     }
+
+    public ArrayList<Cannon> getCannons(){
+        return cannons;
+    }
+
+
+
 
 
 }

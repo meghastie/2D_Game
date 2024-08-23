@@ -2,6 +2,7 @@ package Utilz;
 
 import Entities.Crabby;
 import Main.Game;
+import Objects.Cannon;
 import Objects.GameContainer;
 import Objects.Potion;
 import Objects.Spike;
@@ -92,24 +93,45 @@ public class HelpMethods {
         return true;
     }
 
-    public static boolean IsAllTilesWalkable(int xStart, int xEnd, int y, int[][] lvlData) {
-        for (int i = 0; i < xEnd - xStart; i++) { //i < diff between tiles
-            if (IsTileSolid(xStart + i, y, lvlData)) { // start with second as second tile is smaller than first
-                return false;
-            }
-            if (!IsTileSolid(xStart + i, y + 1, lvlData)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public static boolean IsFloor(Rectangle2D.Float hitbox, float xSpeed, int[][] lvlData) {
         if(xSpeed > 0){
             return IsSolid(hitbox.x + hitbox.width + xSpeed, hitbox.y + hitbox.height + 1, lvlData);
         }else {
             return IsSolid(hitbox.x + xSpeed, hitbox.y + hitbox.height + 1, lvlData); //if its solid we can walk ther. hitbox.y + hitbox.height + 1 - not checking hitbox, checking pixel below
         }
+    }
+
+    public static boolean CanCannonSeePlayer(int[][] lvlData, Rectangle2D.Float firstHitbox, Rectangle2D.Float secondHitbox, int yTile){
+        int firstXTile = (int) (firstHitbox.x / Game.TILES_SIZE);
+        int secondXTile = (int) (secondHitbox.x / Game.TILES_SIZE);
+
+        if (firstXTile > secondXTile) {
+            return IsAllTilesClear(secondXTile, firstXTile, yTile, lvlData);
+        } else {
+            return IsAllTilesClear(firstXTile, secondXTile, yTile, lvlData);
+        }
+    }
+
+    //checks tiles. just need tiles from x and y for cannon
+    public static boolean IsAllTilesClear(int xStart, int xEnd, int y, int[][] lvlData){
+        for (int i = 0; i < xEnd - xStart; i++) { //i < diff between tiles
+            if (IsTileSolid(xStart + i, y, lvlData)) { // start with second as second tile is smaller than first
+                return false;
+            }
+        }
+        return true;
+    }
+
+    //checks tiles beneath tiles we are checking - needed for enemy
+    public static boolean IsAllTilesWalkable(int xStart, int xEnd, int y, int[][] lvlData) {
+        if(IsAllTilesClear(xStart, xEnd, y, lvlData)){
+            for (int i = 0; i < xEnd - xStart; i++) { //i < diff between tiles
+                if (!IsTileSolid(xStart + i, y + 1, lvlData)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public static boolean IsSightClear(int[][] lvlData, Rectangle2D.Float firstHitbox, Rectangle2D.Float secondHitbox, int yTile) { //in helper methods as may be used for things like projectiles etc. other classes will use apart form enemy
@@ -214,6 +236,20 @@ public class HelpMethods {
                 int value = color.getBlue();
                 if(value == SPIKE) {
                     list.add(new Spike(j * Game.TILES_SIZE, i * Game.TILES_SIZE, SPIKE));
+                }
+            }
+        }
+        return list;
+    }
+
+    public static ArrayList<Cannon> GetCannons(BufferedImage img){
+        ArrayList<Cannon> list = new ArrayList<>();
+        for (int i = 0; i < img.getHeight(); i++){
+            for (int j = 0; j < img.getWidth(); j++){
+                Color color = new Color(img.getRGB(j,i));
+                int value = color.getBlue();
+                if(value == CANNON_LEFT || value == CANNON_RIGHT) {
+                    list.add(new Cannon(j * Game.TILES_SIZE, i * Game.TILES_SIZE, value));
                 }
             }
         }

@@ -34,6 +34,8 @@ public class GameObject {
                 if(objType == BARREL || objType == BOX){ //box and barrel only animated when being destroyed
                     doAnimation = false;
                     active = false;
+                }else if(objType == CANNON_LEFT || objType == CANNON_RIGHT){ //cannon shoots once, checks if player is visible then shoots again. one animation per shot
+                    doAnimation = false;
                 }
             }
         }
@@ -44,7 +46,7 @@ public class GameObject {
         aniTick = 0;
         active = true;
 
-        if(objType == BARREL || objType == BOX){ //if barrell or box dont want to animate from start
+        if(objType == BARREL || objType == BOX || objType == CANNON_RIGHT || objType == CANNON_LEFT){ //if barrell or box or cannon dont want to animate from start
             doAnimation = false;
         } else{
             doAnimation = true; //if potion want to animate from start
