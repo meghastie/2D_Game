@@ -12,18 +12,21 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import static Utilz.Constants.ObjectConstants.*;
+import static Utilz.Constants.Projectiles.*;
 import static Utilz.HelpMethods.CanCannonSeePlayer;
+import static Utilz.HelpMethods.IsProjectileHittingLevel;
 
 public class ObjectManager {
 
     private Playing playing;
     private BufferedImage[][] potionImgs, containerImgs;
     private BufferedImage[] cannonImgs;
-    private BufferedImage spikeImage;
+    private BufferedImage spikeImage, cannonBallImg;
     private ArrayList<Potion> potions;
     private ArrayList<GameContainer> containers;
     private ArrayList<Spike> spikes;
     private ArrayList<Cannon> cannons;
+    private ArrayList<Projectile> projectiles = new ArrayList<>();
     public ObjectManager(Playing playing){
         this.playing = playing;
         loadImgs();
@@ -90,11 +93,15 @@ public class ObjectManager {
     }
 
 
+    /*
+    level determines how many potions, containers, spikes, cannons etc but does not specifcally determine projectiles - every time cannon shoots we add to projectile array and update it.
+     */
     public void loadObjects(Level newLevel){
         potions = new ArrayList<>(newLevel.getPotions());
         containers = new ArrayList<>(newLevel.getContainers());
         spikes = newLevel.getSpikes(); //dont need to make copy like above as will never reset spikes ands there will never be any spawning in the game
         cannons = newLevel.getCannons();
+        projectiles.clear(); //want to clear whenever we start a new level. clear is a method from arrayList which removes all entries from list
     }
 
     private void loadImgs() {
@@ -128,6 +135,9 @@ public class ObjectManager {
         for(int i = 0; i < cannonImgs.length; i++){
             cannonImgs[i] = temp.getSubimage(i*40,0,40,26);
         }
+
+        //cannon ball image
+        cannonBallImg = LoadSave.GetSpriteAtlas(LoadSave.CANNON_BALL);
     }
 
     public void update(int[][] lvlData, Player player){
@@ -144,6 +154,21 @@ public class ObjectManager {
         }
 
         updateCannons(lvlData, player);
+        updateProjectiles(lvlData, player);
+    }
+
+    private void updateProjectiles(int[][] lvlData, Player player) {
+        for(Projectile p : projectiles){
+            if(p.isActive()){
+                p.updatePos();
+                if(p.getHitbox().intersects(player.getHitbox())){
+                    player.changeHealth(-25);
+                    p.setActive(false);
+                }else if(IsProjectileHittingLevel(p,lvlData)){
+                    p.setActive(false);
+                }
+            }
+        }
     }
 
     private void updateCannons(int[][] lvlData, Player player) {
@@ -153,12 +178,15 @@ public class ObjectManager {
                     if(isPlayerInRange(c,player)){
                         if(isPlayerInFrontOfCannon(c,player)){
                             if(CanCannonSeePlayer(lvlData, player.getHitbox(),c.getHitbox(), c.getTileY()))
-                                shootCannon(c);
+                                c.setAnimation(true); //cannon will now load up before shooting cannon ball - isnt instant
                         }
                     }
                 }
             }
             c.update(); //cannons will always be active so just update is good enough
+            if(c.getAniIndex() == 4 && c.getAniTick() == 0){
+                shootCannon(c);
+            }
         }
         /* check below if cannon is NOT animating. if animating means its abt to shoot.
          * tileY is same
@@ -170,7 +198,11 @@ public class ObjectManager {
     }
 
     private void shootCannon(Cannon c) {
-        c.setAnimation(true);
+        int dir = 1;
+        if(c.getObjType() == CANNON_LEFT){
+            dir = -1;
+        }
+        projectiles.add(new Projectile((int)(c.getHitbox().x) , (int)(c.getHitbox().y) , dir));
     }
 
     private boolean isPlayerInFrontOfCannon(Cannon c, Player player) {
@@ -194,6 +226,15 @@ public class ObjectManager {
         drawContainers(g,xLvlOffset);
         drawTraps(g, xLvlOffset);
         drawCannons(g, xLvlOffset);
+        drawProjectiles(g, xLvlOffset);
+    }
+
+    private void drawProjectiles(Graphics g, int xLvlOffset) {
+        for(Projectile p : projectiles){
+            if(p.isActive()){
+                g.drawImage(cannonBallImg, (int) (p.getHitbox().x - xLvlOffset), (int)(p.getHitbox().y), CANNON_BALL_WIDTH, CANNON_BALL_HEIGHT, null);
+            }
+        }
     }
 
     private void drawCannons(Graphics g, int xLvlOffset) {
