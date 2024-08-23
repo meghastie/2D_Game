@@ -22,7 +22,7 @@ public class Game implements Runnable {
 
     //Calculate the size of the game window based on tile size - keep level in good porprotion to window.
     public final static int TILE_DEFAULT_SIZE = 32;
-    public final static float SCALE = 1.5f;
+    public final static float SCALE = 2;
     public final static int TILES_IN_WIDTH = 26; //VISIBLE tiles in width - not total. same for height - not acc size of levek
     public final static int TILES_IN_HEIGHT = 14;
     public final static int TILES_SIZE = (int) (TILE_DEFAULT_SIZE * SCALE);
