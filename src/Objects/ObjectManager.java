@@ -165,7 +165,7 @@ public class ObjectManager {
          * check if player is in range
          * is player in front of cannon
          * check line of sight
-         * if all true, file cannon
+         * if all true, fire cannon
          */
     }
 
