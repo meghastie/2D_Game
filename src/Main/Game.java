@@ -1,8 +1,10 @@
 package Main;
 
+import Gamestates.GameOptions;
 import Gamestates.Gamestate;
 import Gamestates.Playing;
 import Gamestates.Menu;
+import UI.AudioOptions;
 
 import java.awt.*;
 
@@ -19,6 +21,8 @@ public class Game implements Runnable {
 
     private Playing playing;
     private Menu menu;
+    private AudioOptions audioOptions;
+    private GameOptions gameOptions;
 
     //Calculate the size of the game window based on tile size - keep level in good porprotion to window.
     public final static int TILE_DEFAULT_SIZE = 32;
@@ -41,8 +45,10 @@ public class Game implements Runnable {
     }
 
     private void initClasses() {
+        audioOptions = new AudioOptions();
         menu = new Menu(this);
         playing = new Playing(this);
+        gameOptions = new GameOptions(this);
     }
 
     private void startGameLoop() {
@@ -60,6 +66,8 @@ public class Game implements Runnable {
                 playing.update();
                 break;
             case OPTIONS:
+                gameOptions.update();
+                break;
             case QUIT:
                 System.exit(0);
             default:
@@ -82,6 +90,9 @@ public class Game implements Runnable {
                 break;
             case PLAYING://if in playing, will only ever render whats in playing state - go to playing class
                 playing.draw(g);
+                break;
+            case OPTIONS:
+                gameOptions.draw(g);
                 break;
             default:
                 break;
@@ -146,6 +157,15 @@ public class Game implements Runnable {
     public Playing getPlaying(){
         return playing;
     }
+
+    public AudioOptions getAudioOptions(){
+        return audioOptions;
+    }
+
+    public GameOptions getGameOptions(){
+        return gameOptions;
+    }
+
 
 
 }
