@@ -34,6 +34,8 @@ public class KeyboardInputs implements KeyListener {
             case PLAYING:
                 gamePanel.getGame().getPlaying().keyPressed(e); //if key is pressed, go to keyPressed in Playing class. if it is backspace, go to menu.
                 break;
+            case OPTIONS:
+                gamePanel.getGame().getGameOptions().keyPressed(e);
             default:
                 break;
         }
@@ -47,6 +49,8 @@ public class KeyboardInputs implements KeyListener {
                 case PLAYING:
                     gamePanel.getGame().getPlaying().keyReleased(e);
                     break;
+                case OPTIONS:
+                    gamePanel.getGame().getGameOptions().keyReleased(e);
                 default:
                     break;
             }

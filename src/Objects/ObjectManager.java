@@ -293,6 +293,5 @@ public class ObjectManager {
         for(Cannon c : cannons){
             c.reset();
         }
-
     }
 }
