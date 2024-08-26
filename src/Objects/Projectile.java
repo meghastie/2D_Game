@@ -16,6 +16,7 @@ public class Projectile {
     private boolean active = true;
 
     public Projectile(int x, int y, int dir){
+        //cannon ball spawn pointa
         int xOffset = (int)(-3 * Game.SCALE);//default if facing to left
         int yOffset = (int)(5 * Game.SCALE);//will be same for both left & right
 

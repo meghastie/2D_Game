@@ -87,8 +87,19 @@ public class Player extends Entity{
     public void update() {
         updateHealthBar();
         if(currentHealth <= 0){
-            playing.setGameOver(true);
-            return;
+            if(state != DEAD){ //start of death
+                state = DEAD;
+                aniTick = 0;
+                aniIndex = 0;
+                playing.setPlayerDying(true);
+            }else if(aniIndex == GetSpriteAmount(DEAD) - 1 && aniTick >= ANI_SPEED -1 ){ //-1 as if there are 7 sprites, cant check 7th animation as starts at 0. first part checks last sprite, second is last animation tick. end of death
+                playing.setGameOver(true);
+            }else{
+                updateAnimationTick(); //if not at start / end pf death sequenece, continue updating
+            }
+
+            //playing.setGameOver(true);
+            return; //return as as soon as we are dead, dont want to update attackbox, position etc
         }
 
         updateAttackBox();
