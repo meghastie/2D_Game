@@ -1,5 +1,6 @@
 package Entities;
 
+import Audio.AudioPlayer;
 import Gamestates.Playing;
 import Main.Game;
 import Objects.Potion;
@@ -92,8 +93,11 @@ public class Player extends Entity{
                 aniTick = 0;
                 aniIndex = 0;
                 playing.setPlayerDying(true);
+                playing.getGame().getAudioPlayer().playEffect(AudioPlayer.DIE);
             }else if(aniIndex == GetSpriteAmount(DEAD) - 1 && aniTick >= ANI_SPEED -1 ){ //-1 as if there are 7 sprites, cant check 7th animation as starts at 0. first part checks last sprite, second is last animation tick. end of death
                 playing.setGameOver(true);
+                playing.getGame().getAudioPlayer().stopSong();
+                playing.getGame().getAudioPlayer().playEffect(AudioPlayer.GAMEOVER);
             }else{
                 updateAnimationTick(); //if not at start / end pf death sequenece, continue updating
             }
@@ -132,6 +136,7 @@ public class Player extends Entity{
         attackChecked = true;
         playing.checkEnemyHit(attackBox);
         playing.checkObjectHit(attackBox);
+        playing.getGame().getAudioPlayer().playAttackSound();
 
     }
 
@@ -275,6 +280,7 @@ public class Player extends Entity{
         if (inAir){
             return;
         }
+        playing.getGame().getAudioPlayer().playEffect(AudioPlayer.JUMP);
         inAir = true;
         airSpeed = jumpSpeed;
 

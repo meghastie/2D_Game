@@ -1,5 +1,6 @@
 package Main;
 
+import Audio.AudioPlayer;
 import Gamestates.GameOptions;
 import Gamestates.Gamestate;
 import Gamestates.Playing;
@@ -23,6 +24,7 @@ public class Game implements Runnable {
     private Menu menu;
     private AudioOptions audioOptions;
     private GameOptions gameOptions;
+    private AudioPlayer audioPlayer;
 
     //Calculate the size of the game window based on tile size - keep level in good porprotion to window.
     public final static int TILE_DEFAULT_SIZE = 32;
@@ -45,7 +47,8 @@ public class Game implements Runnable {
     }
 
     private void initClasses() {
-        audioOptions = new AudioOptions();
+        audioOptions = new AudioOptions(this);
+        audioPlayer = new AudioPlayer();
         menu = new Menu(this);
         playing = new Playing(this);
         gameOptions = new GameOptions(this);
@@ -166,6 +169,8 @@ public class Game implements Runnable {
         return gameOptions;
     }
 
-
+    public AudioPlayer getAudioPlayer(){
+        return audioPlayer;
+    }
 
 }
