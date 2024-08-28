@@ -1,7 +1,8 @@
-# 2D_Game
+# 2D_Game - episode 19
 
-My first ever game project - a 2D platformer game. To create this game, I used the online tutorial by Kaarin Gaming. 
+The game now has objects - 2 typos of potions, barrels and boxes:
+* The red potion will increase a players health by 15, as represented on the players health bar. If the player is at max health, it will have no effect.
+* The blue potion will increase a players 'power' by 10 - functionality to come
+* By attacking boxes and barrels, the player can break them open. Upon breaking them, the player will get a potion.
+* potions are constantly animating, however boxes and barrells will only animate when being broken.
 
-I decided to follow this tutorial to enhance my overall Java skills and knowledge of the Java swing library, and get used to developing an interactive user interface. As of now, the game is a work in progress, and I plan to finish it and create my own levels / personal tweaks, then hopefully start developing my own game projects.
-
-Each branch is a seperate episode of the tutorial. The code contains a series of comments for my own understanding and learning.
