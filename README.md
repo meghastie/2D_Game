@@ -1,7 +1,8 @@
-# 2D_Game
+# 2D_Game - episode 25
 
-My first ever game project - a 2D platformer game. To create this game, I used the online tutorial by Kaarin Gaming. 
-
-I decided to follow this tutorial to enhance my overall Java skills and knowledge of the Java swing library, and get used to developing an interactive user interface. As of now, the game is a work in progress, and I plan to finish it and create my own levels / personal tweaks, then hopefully start developing my own game projects.
-
-Each branch is a seperate episode of the tutorial. The code contains a series of comments for my own understanding and learning.
+The game now includes sounds using the Clip library. 
+* The start menu has it's own music
+* All levels have songs. There is 2 songs, and every second level will have the same as the second previous level.
+* The game also now includes sound effects for specific user animations - e.g. jumping, attacking or dying.
+* The user can adjust the volume and toggle the sounds in either the pause screen or options menu. Whatever the user chooses in one will be the same on the other.
+* When unmuting the sound effects, the user jumping sound will play to show the user they are enabled.
