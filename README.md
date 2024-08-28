@@ -5,3 +5,7 @@ My first ever game project - a 2D platformer game. To create this game, I used t
 I decided to follow this tutorial to enhance my overall Java skills and knowledge of the Java swing library, and get used to developing an interactive user interface. As of now, the game is a work in progress, and I plan to finish it and create my own levels / personal tweaks, then hopefully start developing my own game projects.
 
 Each branch is a seperate episode of the tutorial. The code contains a series of comments for my own understanding and learning.
+
+# How to play
+
+The player can move left and right by using the A and D keys respectivley, and can jump using the space bar. As of now the game has 3 levels, and to progress through each the player must kill all enemies, who will chase the player and try to attack them when in range. The player can attack by using a left click. As well as fighting enemies, the player must avoid projectiles like cannons, and objects like spikes. The game can be paused and unpaused using the escape key, and music / sound effects volume can be adjusted. 
