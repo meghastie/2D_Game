@@ -8,7 +8,7 @@ Each branch is a seperate episode of the tutorial I followed. There is a README 
 
 # How to play
 
-The player can move left and right by using the A and D keys respectively, and can jump using the space bar. As of now the game has 3 levels, and to progress through each the player must kill all enemies, who will chase the player and try to attack them when in range. The player can attack by using a left click. As well as fighting enemies, the player must avoid projectiles like cannonballs, and traps like spikes. The game can be paused and unpaused using the escape key, and music / sound effects volume can be adjusted. 
+The player can move left and right by using the A and D keys respectively, and can jump using the space bar. As of now the game has 3 levels, and to progress through each the player must kill all enemies, who will chase the player and try to attack them when in range. The player can attack by using a left click, or power attack by using a back space. As well as fighting enemies, the player must avoid projectiles like cannonballs, and traps like spikes. The game can be paused and unpaused using the escape key, and music / sound effects volume can be adjusted when paused or by selecting the options button in the home menu.  Red potions will boost a players health and blue potions will boost a players power.
 
 # Credits
 
