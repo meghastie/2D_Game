@@ -195,8 +195,15 @@ public class Playing extends State implements Statemethods{
      */
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {//button1 left, 2 middle, 3 right
-            player.setAttacking(true);
+        if(!gameOver){
+            if (e.getButton() == MouseEvent.BUTTON1) {//button1 left, 2 middle, 3 right
+                player.setAttacking(true);
+                //player.powerAttack();
+            }
+
+            //if(e.getButton() == MouseEvent.BUTTON3){ //button 3 right
+                //player.powerAttack();
+            //}
         }
     }
 
@@ -256,9 +263,9 @@ public class Playing extends State implements Statemethods{
             gameOverOverlay.keyPressed(e);
         }else {
             switch (e.getKeyCode()) {
-                //case KeyEvent.VK_W:
-                //  gamePanel.getGame().getPlayer().setUp(true); //move UP
-                //break;
+                case KeyEvent.VK_BACK_SPACE:
+                    player.powerAttack();
+                    break;
                 case KeyEvent.VK_A:
                     player.setLeft(true); //move LEFT
                     break;

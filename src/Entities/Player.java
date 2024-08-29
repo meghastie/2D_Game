@@ -48,6 +48,14 @@ public class Player extends Entity{
     private int healthBarXStart = (int) (34 * Game.SCALE);
     private int healthBarYStart = (int) (14 * Game.SCALE);
 
+    private int powerBarWidth = (int) (104 * Game.SCALE);
+    private int powerBarHeight = (int) (2 * Game.SCALE);
+    private int powerBarXStart = (int) (44 * Game.SCALE);
+    private int powerBarYStart = (int) (34 * Game.SCALE);
+    private int powerWidth = powerBarWidth;
+    private int powerMaxValue = 200;
+    private int powerValue = powerMaxValue;
+
     private int healthWidth = healthBarWidth;
 
     //AttackBox
@@ -58,6 +66,10 @@ public class Player extends Entity{
     private Playing playing;
 
     private int tileY = 0;
+    private boolean powerAttackActive;
+    private int powerAttackTick; //will increase one every update for as long as the power attack is active. once it reaches limit, stop attack
+    private int powerGrowSpeed = 15; //how much power will increase
+    private int powerGrowTick;
 
 
     public Player(float x, float y, int width, int height, Playing playing) {
@@ -87,6 +99,7 @@ public class Player extends Entity{
 
     public void update() {
         updateHealthBar();
+        updatePowerBar();
         if(currentHealth <= 0){
             if(state != DEAD){ //start of death
                 state = DEAD;
@@ -113,13 +126,22 @@ public class Player extends Entity{
             checkPotionTouched();
             checkSpikesTouched();
             tileY = (int) (hitbox.y / Game.TILES_SIZE);
+            if(powerAttackActive){ //will always be movig when power attack
+                powerAttackTick++;
+                if(powerAttackTick >= 35){
+                    powerAttackTick = 0;
+                    powerAttackActive = false;
+                }
+            }
         }
-        if(attacking){
+        if(attacking || powerAttackActive){
             checkAttack();
         }
         updateAnimationTick();
         setAnimation();
     }
+
+
 
     private void checkSpikesTouched() {
         playing.checkSpikesTouched(this);
@@ -134,6 +156,11 @@ public class Player extends Entity{
             return;
         }
         attackChecked = true;
+
+        if(powerAttackActive){
+            attackChecked = false;  //makes sure eery update we are checking attack again
+        }
+
         playing.checkEnemyHit(attackBox);
         playing.checkObjectHit(attackBox);
         playing.getGame().getAudioPlayer().playAttackSound();
@@ -141,9 +168,9 @@ public class Player extends Entity{
     }
 
     private void updateAttackBox() {
-        if(right){
+        if(right || (powerAttackActive && flipW == 1)){
             attackBox.x = hitbox.x + hitbox.width + (int)(Game.SCALE * 10);
-        } else if(left){
+        } else if(left || (powerAttackActive && flipW == -1)){
             attackBox.x = hitbox.x - hitbox.width - (int)(Game.SCALE * 10);
         }
         attackBox.y = hitbox.y + (Game.SCALE * 10);
@@ -153,6 +180,18 @@ public class Player extends Entity{
         healthWidth = (int)((currentHealth / (float) maxHealth) * healthBarWidth);
     }
 
+    private void updatePowerBar(){
+        powerWidth = (int) ((powerValue / (float) powerMaxValue) * powerBarWidth);
+
+        powerGrowTick++; //power will build slowly as time passes
+        if (powerGrowTick >= powerGrowSpeed) {
+            powerGrowTick = 0;
+            changePower(1);
+        }
+    }
+
+
+
     public void render(Graphics g, int lvlOffset) {
         g.drawImage(animations[state][aniIndex], (int)(hitbox.x - xDrawOffset) - lvlOffset + flipX, (int)(hitbox.y - yDrawoffset), width * flipW, height, null); //x and y of hitbox, width and height of sprite
         //drawHitbox(g, lvlOffset);
@@ -161,9 +200,14 @@ public class Player extends Entity{
     }
 
     private void drawUI(Graphics g) {
+        //background for health and power
         g.drawImage(statusBarImg, statusBarX, statusBarY, statusBarWidth, statusBarHeight, null);
+        //healthbar
         g.setColor(Color.red);
         g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, healthWidth, healthBarHeight); //status bar x/y is offset between top of whole image and width where ir starts after the heart icon
+        //powerbar
+        g.setColor(Color.yellow);
+        g.fillRect(powerBarXStart + statusBarX, powerBarYStart + statusBarY, powerWidth, powerBarHeight);
     }
 
     private void updateAnimationTick() {
@@ -200,6 +244,13 @@ public class Player extends Entity{
 
         }
 
+        if(powerAttackActive){
+            state = ATTACK;
+            aniIndex = 1;
+            aniTick = 0;
+            return;
+        }
+
         if (attacking) {
             state = ATTACK;
             if(startAni != ATTACK){ //wasnt attacking when entering this method
@@ -227,8 +278,10 @@ public class Player extends Entity{
         }
 
         if(!inAir){
-            if((!left && !right) || (right && left)){ //if not holding down any button or in air no point in being here - standng still
-                return;
+            if(!powerAttackActive){
+                if((!left && !right) || (right && left)){ //if not holding down any button or in air no point in being here - standng still
+                    return;
+                }
             }
         }
         float xSpeed = 0; //temp storage of speed in x dir
@@ -249,13 +302,24 @@ public class Player extends Entity{
             flipW = 1;
         }
 
+        if(powerAttackActive){ //this will make the sprite move faster wehn power attacking
+            if(!left && !right){
+                if(flipW == -1){ //facing left
+                    xSpeed = -walkSpeed;
+                }else{
+                    xSpeed = walkSpeed;
+                }
+            }
+            xSpeed *= 3; //3 times speed if in a power attack
+        }
+
         if (!inAir){
             if (!IsEntityOnFloor(hitbox, lvlData)){
                 inAir = true;
             }
         }
 
-        if (inAir){ //if in air, only need to check in y direction for collisions
+        if (inAir && !powerAttackActive){ //if in air, only need to check in y direction for collisions. dont want to update y if in power attack. if jump and press ower attack, just go straight but faster. when power attack ends, start updating y again
             if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)){
                 hitbox.y += airSpeed; //airSpeed will incrase over time
                 airSpeed += GRAVITY;
@@ -296,11 +360,19 @@ public class Player extends Entity{
             hitbox.x += xSpeed;
         }else {
             hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed); //if we cant, then we move next o it
+            if(powerAttackActive){ //if we hit a wall, stop
+                powerAttackActive = false;
+                powerAttackTick = 0;
+            }
         }
     }
 
     public void changePower(int value){
-        System.out.println("Blue Potion");
+        powerValue += value;
+        if (powerValue >= powerMaxValue)
+            powerValue = powerMaxValue;
+        else if (powerValue <= 0)
+            powerValue = 0;
     }
 
     public void changeHealth(int value){
@@ -388,6 +460,16 @@ public class Player extends Entity{
 
     public int getTileY(){
         return tileY;
+    }
+
+    public void powerAttack(){
+        if(powerAttackActive){
+            return;
+        }
+        if(powerValue >= 60){
+            powerAttackActive = true;
+            changePower(-60);
+        }
     }
 }
 
