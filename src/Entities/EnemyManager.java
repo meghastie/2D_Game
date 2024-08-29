@@ -70,10 +70,12 @@ public class EnemyManager {
 
     public void checkEnemyHit(Rectangle2D.Float attackBox){
         for(Crabby c: crabbies){
-            if(c.isActive()){
-                if(attackBox.intersects(c.getHitbox())){ //if returns true, player did hit an enemy
-                    c.hurt(10);
-                    return; //player should only be able to hit one enemy at a time
+            if(c.getCurrentHealth() > 0){
+                if(c.isActive()) {
+                    if (attackBox.intersects(c.getHitbox())) { //if returns true, player did hit an enemy
+                        c.hurt(10);
+                        return; //player should only be able to hit one enemy at a time
+                    }
                 }
             }
         }

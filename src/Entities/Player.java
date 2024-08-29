@@ -94,6 +94,7 @@ public class Player extends Entity{
 
     private void initAttackBox() {
         attackBox = new Rectangle2D.Float(x,y, (int) (20 * Game.SCALE), (int) (20 * Game.SCALE));
+        resetAttackBox();
     }
 
 
@@ -151,7 +152,7 @@ public class Player extends Entity{
         playing.checkPotionTouched(hitbox);
     }
 
-    private void checkAttack() { //check we are on correct sprite index and we haven checked before
+    private void  checkAttack() { //check we are on correct sprite index and we haven checked before
         if(attackChecked || aniIndex != 1){
             return;
         }
@@ -168,7 +169,14 @@ public class Player extends Entity{
     }
 
     private void updateAttackBox() {
-        if(right || (powerAttackActive && flipW == 1)){
+        if(right || left){
+            if(flipW == 1){
+                attackBox.x = hitbox.x + hitbox.width + (int)(Game.SCALE * 10);
+            }else{
+                attackBox.x = hitbox.x - hitbox.width - (int)(Game.SCALE * 10);
+            }
+        }
+        else if(right || (powerAttackActive && flipW == 1)){
             attackBox.x = hitbox.x + hitbox.width + (int)(Game.SCALE * 10);
         } else if(left || (powerAttackActive && flipW == -1)){
             attackBox.x = hitbox.x - hitbox.width - (int)(Game.SCALE * 10);
@@ -290,25 +298,25 @@ public class Player extends Entity{
          */
 
 
-        if(left) { //check if pressing just left
+        if(left && !right) { //check if pressing just left
             xSpeed -= walkSpeed;
             flipX = width;
             flipW = -1;
         }
 
-        if (right) { //check if pressing just right
+        if (right && !left) { //check if pressing just right
             xSpeed += walkSpeed;
             flipX = 0;
             flipW = 1;
         }
 
         if(powerAttackActive){ //this will make the sprite move faster wehn power attacking
-            if(!left && !right){
-                if(flipW == -1){ //facing left
-                    xSpeed = -walkSpeed;
-                }else{
-                    xSpeed = walkSpeed;
-                }
+            if((!left && !right)||(left && right)){
+                    if(flipW == -1){ //facing left
+                        xSpeed = -walkSpeed;
+                    }else{
+                        xSpeed = walkSpeed;
+                    }
             }
             xSpeed *= 3; //3 times speed if in a power attack
         }
@@ -446,16 +454,27 @@ public class Player extends Entity{
         inAir = false;
         attacking = false;
         moving = false;
+        airSpeed = 0f;
         state = IDLE;
         currentHealth = maxHealth;
 
         hitbox.x = x; //go back to start point
         hitbox.y = y;
 
+        resetAttackBox();
+
         if (!IsEntityOnFloor(hitbox, lvlData)){
             inAir = true;
         }
 
+    }
+
+    private void resetAttackBox(){
+        if(flipW == 1){
+            attackBox.x = hitbox.x + hitbox.width + (int)(Game.SCALE * 10);
+        }else{
+            attackBox.x = hitbox.x - hitbox.width - (int)(Game.SCALE * 10);
+        }
     }
 
     public int getTileY(){
